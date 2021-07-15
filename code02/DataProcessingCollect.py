@@ -27,12 +27,12 @@ os.chdir(dname)
 #import functions from other scripts
 #folders containing the scripts must be in the same folder then the working folder of this script
 from ForceCellProcessing import processData
-from MoCapPostprocessing import telemMS_Vicon
+# from MoCapPostprocessing import telemMS_Vicon
 from MoCapPostprocessing import Segmentation
 from MoCapPostprocessing import PoseOptimization
 
 #rename function
-ex = telemMS_Vicon.extraction
+# ex = telemMS_Vicon.extraction
 
 #set the input files and file locations
 # pathMoCap = r"E:\ETHZ\mast_sem_IV\pdm\marc\03_Relevant Files\03_Software\MoCap_Logs\S01_19112020\S01_19112020_Trial02.pkl"
@@ -365,7 +365,7 @@ def data_processing_collect(pathMoCap, pathForce, pathMS, filename_out):
     princ_dir_allseg = []
         
     if proceed =="y":
-        print('\nOptimization procedure...')
+        # print('\nOptimization procedure...')
         
         #set up counter indicating the processed segment
         segno = 0
@@ -378,7 +378,7 @@ def data_processing_collect(pathMoCap, pathForce, pathMS, filename_out):
             
             #provide optimization progress to console
             segno +=1
-            print('\nOptimizing Segment',segno)
+            # print('\nOptimizing Segment',segno)
             
             #correct the segment data
             segcorr,res_norm,princ_dir = PoseOptimization.optimsegment_Soederkvist(references[segno-1],segment)
@@ -403,6 +403,7 @@ def data_processing_collect(pathMoCap, pathForce, pathMS, filename_out):
     
     out_dict["time"] = t
     out_dict["AlphaShank"] = AlphaShank[0: len_corr]
+    out_dict["AlphaThigh"] = AlphaThigh[0: len_corr]
     out_dict["AlphaTrunk"] = AlphaTrunk[0: len_corr]
     out_dict["EncCount"] = EncCount[0: len_corr]
     out_dict["CurrentRead"] = CurrentRead[0: len_corr]
