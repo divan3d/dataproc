@@ -22,7 +22,7 @@ os.chdir(dname)
 from MoCapPostprocessing import SegmentationNew
 from MoCapPostprocessing import PoseOptimization
 
-def data_processing_collect(pathMoCap, pathMS, filename_out, have_MS_data):
+def data_processing_collect(pathMoCap, pathMS, have_MS_data):
     
     #import MoCap marker cloud
     file = open(pathMoCap,'rb')

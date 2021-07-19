@@ -6,7 +6,7 @@ Created on Tue May 18 15:35:38 2021
 
 data pre- processing - interprets mocap angles
 saves all needed data in pd dataframe 
-call function "data_processing_interpretation(name_filein, name_fileout, save_file)"
+call function "data_processing_interpretation(name_filein, have MS)"
 """
 
 import os 
@@ -38,7 +38,7 @@ def getinitialdirections(segments):
     # ressemble le plus a comment marc a fait
     shankinit[:,2] = (segments[0][0][0,:]-segments[0][0][3,:])/np.linalg.norm(segments[0][0][0,:]-segments[0][0][3,:])
     # thigh z vect : marker 4 to 1 
-    thighinit[:,2] = (segments[1][0][0,:]-segments[1][0][1,:])/np.linalg.norm(segments[1][0][0,:]-segments[1][0][1,:])
+    thighinit[:,2] = (segments[1][0][0,:]-segments[1][0][3,:])/np.linalg.norm(segments[1][0][0,:]-segments[1][0][3,:])
     # kmal z vect : marker 3 to 1 
     KMAlowinit[:,2] = (segments[2][0][0,:]-segments[2][0][2,:])/np.linalg.norm(segments[2][0][0,:]-segments[2][0][2,:])
     # kmau z vect : marker 4 to 1 

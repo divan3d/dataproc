@@ -12,7 +12,7 @@ fonctionne que si est dans le fichier code02, faudra changer ?
 import pickle
 import DataProcessingMCInterpretationNEW
 import DataProcessingMCInterpretation
-import DataProcessingFunctions, dataprocessing_nv
+import DataProcessingFunctions, DataProcessingCollectNEW
 # import DataProcessingFunctions, DataProcessingCollect 
 import os
 
@@ -57,19 +57,20 @@ def file_save(obj, name, save_file, pickle_file):
 # new 
 
 # Input data 
-# tpathMoCap = r"E:\ETHZ\mast_sem_IV\pdm\experiment\2021_07_09_BALGRIST\Kanako Cal 02.pkl"
-# tpathMS = "bla.pkl"
+tpathMoCap = r"E:\ETHZ\mast_sem_IV\pdm\experiment\2021_07_09_BALGRIST\Kanako Cal 02.pkl"
+tpathMS = "bla.pkl"
 
-# test_dpcollect = dataprocessing_nv.data_processing_collect(tpathMoCap, tpathMS, tDPC_outname, False)
+# enfaite il y a aussi la force 
+test_dpcollect = DataProcessingCollectNEW.data_processing_collect(tpathMoCap, tpathMS, False)
 
 # Save 
-# tDPC_outname = "new_test.pkl"
-# file_save(test_dpcollect, tDPC_outname, True, False)
+tDPC_outname = "SA_090721_COL_00.pkl"
+file_save(test_dpcollect, tDPC_outname, True, False)
 
 #%% Interpret Mocap data - extract angles 
 
 # Input data
-tDI_filein = r"E:\ETHZ\mast_sem_IV\pdm\code02\new_test.pkl"
+tDI_filein = r"E:\ETHZ\mast_sem_IV\pdm\code02\SA_090721_COL_00.pkl"
 tDI_datain = op_pickle(tDI_filein)
 
 # old
@@ -79,7 +80,7 @@ tDI_datain = op_pickle(tDI_filein)
 test_pdint = DataProcessingMCInterpretationNEW.data_processing_interpretation(tDI_datain, False)
 
 # Save
-tDI_outname = "new_test_mod_getdirec_int.pkl"
+tDI_outname = "SA_090721_INT_00.pkl"
 file_save(test_pdint, tDI_outname, True, True)
 
 # # pr tester si mocap joue bien, peut s'arreter ici ? ou s'arrete apres avoir enlever le offset 
@@ -88,15 +89,18 @@ file_save(test_pdint, tDI_outname, True, True)
 
 #%% remove offset 
 
-# tcut_filein = r"E:\ETHZ\mast_sem_IV\pdm\code02\new_test_shankdiff_int.pkl"
-# d_in = op_pickle(tcut_filein)
-d_in = test_pdint
+tcut_filein = r"E:\ETHZ\mast_sem_IV\pdm\code02\SA_090721_INT_00.pkl"
+d_in = op_pickle(tcut_filein)
+# d_in = test_pdint
 
 DataProcessingFunctions.dyn_remove_offset_bodypart(d_in, "shank")
 DataProcessingFunctions.dyn_remove_offset_bodypart(d_in, "thigh")
 
+DataProcessingFunctions.plot_res_shank(d_in)
+DataProcessingFunctions.plot_res_thigh(d_in)
+
 # Save
-ro_file_name = "test_mod_getdirec_functions_not_cut.pkl"
+ro_file_name = "SA_090721_FUN_00.pkl"
 file_save(d_in, ro_file_name, True, False)
 
 

@@ -95,14 +95,14 @@ def dyn_cut_in_ind_gait(d1, list_of_max):
 
     Parameters
     ----------
-    d1 : dataframe containing dynamic trial
-    list_of_max : list of indices of max shank values 
+    d1 : dataframe : containing dynamic trial
+    list_of_max : list : of indices of max shank values 
 
     Returns
     -------
-    None. -- dictionnary containing dataframe of each ind gait cycle 
+    dict_of_df : dict : containing dataframe of each ind gait cycle
 
-    """
+    """ 
     dict_of_df = {}
     for cidx in range(len(list_of_max)-1):
         dict_of_df[cidx] = d1.iloc[list_of_max[cidx]:list_of_max[cidx+1]]  
@@ -174,6 +174,39 @@ def plot_single_gait(ex_dict, gait_nbr):
     plt.legend()
     plt.title("one gait cycle")
     return
+
+def plot_res_shank(d1):
+    idx = range(10, len(d1["t"]) - 10)
+    
+    plt.figure()
+    plt.plot(d1["t"][idx], d1["no_mc_kmal_angle"][idx], label = "kmal")
+    plt.plot(d1["t"][idx], d1["no_mc_shank_angle"][idx], label = "shank")
+    plt.plot(d1["t"][idx], d1["res_norm_shank"][idx], label = "res shank")
+    plt.plot(d1["t"][idx], d1["res_norm_kmal"][idx], label = "res kma")
+    # plt.plot(d1["t"][idx], d1["mc_kmal_angle"][idx], label = "kma")
+    # plt.plot(d1["t"][idx], d1["mc_shank_angle"][idx], label = "body part")
+    # plt.plot(d1["t"][idx], d1["res_norm_shank"][idx], label = "res shank")
+    # plt.plot(d1["t"][idx], d1["res_norm_kmal"][idx], label = "res kma")
+    plt.title("shank angles mocap")
+    plt.legend()
+    return 
+
+def plot_res_thigh(d1):
+    idx = range(10, len(d1["t"]) - 10)
+    
+    plt.figure()
+    plt.plot(d1["t"][idx], d1["no_mc_kmau_angle"][idx], label = "kmau")
+    plt.plot(d1["t"][idx], d1["no_mc_thigh_angle"][idx], label = "thigh")
+    plt.plot(d1["t"][idx], d1["res_norm_thigh"][idx], label = "res thigh")
+    plt.plot(d1["t"][idx], d1["res_norm_kmau"][idx], label = "res kmau")
+    
+    # plt.plot(d1["t"][idx], d1["mc_kmau_angle"][idx], label = "kma")
+    # plt.plot(d1["t"][idx], d1["mc_thigh_angle"][idx], label = "body part")
+    # plt.plot(d1["t"][idx], d1["res_norm_thigh"][idx], label = "res thigh")
+    # plt.plot(d1["t"][idx], d1["res_norm_kmau"][idx], label = "res kmau")
+    plt.title("thigh angles mocap")
+    plt.legend()
+    return 
 
 #%%
 # plot_single_gait(dict_of_df, 40)
