@@ -1,5 +1,6 @@
 '''
 reads out the label names of motion capture markers and groups them into segments
+modified from marc's code
 '''
 import numpy as np
 

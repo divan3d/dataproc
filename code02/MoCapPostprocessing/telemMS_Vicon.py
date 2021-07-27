@@ -219,6 +219,6 @@ def extraction(foldername):
 
 if __name__ == "__main__":
     
-    filepath = r"C:\Users\wirth\polybox\MSc\Master Thesis\03_Relevant Files\03_Software\MoCap_Logs\S01_19112020_Corrected"    
+    filepath = r"E:\ETHZ\mast_sem_IV\pdm\experiment\2021_07_20"  
     procObj = extraction(filepath)
     
