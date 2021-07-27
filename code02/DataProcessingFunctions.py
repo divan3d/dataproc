@@ -23,8 +23,7 @@ def save_obj(obj, name ):
     with open(name, 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
         
-#%%
-
+#%% Remove offset leg related angles
 
 def dyn_remove_offset_bodypart(data_in, body_part):
     """
@@ -64,83 +63,103 @@ def dyn_remove_offset_bodypart(data_in, body_part):
     # return data_in_copy
     return
 
-#%% functions to cut 
+#%% functions to cut trial
 
-# find max
-def dyn_places_to_cut(d1):
+def find_mode_change(d_in):
     """
-    finds maximum of shank angle -- corresponds to heel strike
+    function to separate the different sections of one trial (1/2). Does this by 
+    finding the changes in Mode from MyoSuit data.
 
     Parameters
     ----------
-    d1 : dataframe containing dynamic trial
+    d_in : dataframe : whole trial 
 
     Returns
     -------
-    list_of_max : list, contains indices of max values, 0 and last value added 
-    to help cut the data later
-
+    idx_mode_change : list : contains indices of changes in Mode
     """
-    max2 = scipy.signal.argrelextrema(d1["mc_shank_angle"].values, np.greater_equal, order = 100)
-    size_data = len(d1)
-    list_of_max =  max2[0]
-    list_of_max = np.append(list_of_max, size_data)
-    list_of_max = np.append(0, list_of_max)
-    return list_of_max
+    d_in["Mode"] = d_in["Mode"].round()
+    mode_change = d_in["Mode"].shift() != d_in["Mode"]
+    idx_mode_change = mode_change.index[mode_change == True].tolist()
+    print("nbr of mode changes = %i" %len(idx_mode_change))
+    return idx_mode_change
 
 
-def dyn_cut_in_ind_gait(d1, list_of_max):
+def separate_data(d_in, idx_mode_change):
     """
-    cuts dynamic trial into individual gait cycles 
+    function to separate the different sections of one trial (2/2). Separates
+    the input dataframe in relation to mode value and the structure of the trial.
 
     Parameters
     ----------
-    d1 : dataframe : containing dynamic trial
-    list_of_max : list : of indices of max shank values 
+    d_in : dataframe : whole trial 
+    idx_mode_change : list : output of find_mode_change, indices of mode change 
 
     Returns
     -------
-    dict_of_df : dict : containing dataframe of each ind gait cycle
+    dict_data : dict : contains the separated trials
 
-    """ 
-    dict_of_df = {}
-    for cidx in range(len(list_of_max)-1):
-        dict_of_df[cidx] = d1.iloc[list_of_max[cidx]:list_of_max[cidx+1]]  
-        
-    for key in dict_of_df:
-        dict_of_df[key] = dict_of_df[key].reset_index()
+    """
+    transp = d_in[idx_mode_change[0]: idx_mode_change[1]]
+    iso1 = d_in[idx_mode_change[1]: idx_mode_change[5]]
+    concentric1 = d_in[idx_mode_change[5]: idx_mode_change[6]]
+    lag_val = idx_mode_change[8] - idx_mode_change[7]
+    iso2 = d_in[idx_mode_change[6]: (idx_mode_change[9] + lag_val)]
+    concentric2 = d_in[idx_mode_change[9]:]
+    dict_data =  {"Transparent" : transp, "Isometric1" : iso1, "Concentric1" : concentric1,
+                 "Isometric2": iso2, "Concentric2" : concentric2}
+    return dict_data
+
+
+def check_mode(dict_data):    
+    """
+    prints mean value of mode for each separated trial. 
+
+    Parameters
+    ----------
+    dict_data : dict : contains separated trials
+
+    Returns
+    -------
+    None.
+
+    """
+    print(" checking mode values of separated trials : ")
+    for key in dict_data:
+        mode_check = statistics.mean(dict_data[key]["Mode"])
+        print( key)
+        print("mean mode : %f" % mode_check)
+    return
+
+
+# this one that calls all others 
+def separate_trial(data_in): 
+    """
+    Separates the trial at a certain force level into the transparent, isometric
+    and concentric parts. 
+    Prints mode mean values to check. 
+
+    Parameters
+    ----------
+    data_in : dataframe : whole trial, offset removed 
+
+    Returns
+    -------
+    sep_data : dict : contains dataframe of separated trial 
+
+    """
+    mode_change_idx = find_mode_change(data_in)
+    sep_data = separate_data(data_in, mode_change_idx)
+    check_mode(sep_data)
     
-    return  dict_of_df
+    return sep_data
 
 
-def dyn_cut_to_ind_gait_cycle(data_in):
-    """
-    separates dynamic dataframe into dict of individual gait cycle
-
-    Parameters
-    ----------
-    data_in : dataframe : dynamic experiment 
-
-    Returns
-    -------
-    dict_ind_gait : dict : dict of dataframe of separated gait cycle
-
-    """
-    l_max = dyn_places_to_cut(data_in)
-    dict_ind_gait = dyn_cut_in_ind_gait(data_in, l_max)
-    print(" dictionary of individual gait cycles created")    
-    return dict_ind_gait
-
-#%% test 
-
-# tcut_filein = r"E:\ETHZ\mast_sem_IV\pdm\code02\T_INT.pkl"
-# cut_file_name = "T_CUT.pkl"
-# d_in = op_pickle(tcut_filein)
-
-# dyn_remove_offset_bodypart(d_in, "shank")
-# dyn_remove_offset_bodypart(d_in, "thigh")
-
-# cut_dict = dyn_cut_to_ind_gait_cycle(d_in)
+def save_all_bits_sep(dict_data, dirName):
+    for key in dict_data:
+        tmp_name = dirName + "_" + key
+        save_obj(dict_data[key], tmp_name)
+    return
 
 #%% plots
 
@@ -209,6 +228,5 @@ def plot_res_thigh(d1):
     return 
 
 #%%
-# plot_single_gait(dict_of_df, 40)
-# plot_single_gait(dict_of_df, 50)
+
 

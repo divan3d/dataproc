@@ -34,7 +34,7 @@ def save_obj(obj, name ):
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
         
 def file_save(obj, name, save_file, pickle_file):
-    #pickkle_file que peut etre True si c'est un dataframe 
+    #pickle_file que peut etre True si c'est un dataframe 
     if pickle_file:
         obj.to_pickle(name)
     
@@ -43,6 +43,26 @@ def file_save(obj, name, save_file, pickle_file):
         save_obj(obj, name )
     return
                 
+def save_all_bits_sep(dict_data, dirName):
+    # save dict separately 
+    for key in dict_data:
+        tmp_name = dirName + "_" + key
+        save_obj(dict_data[key], tmp_name)
+    return
+
+def save_trials_sep(dirName, dict_data):  
+    os.chdir(r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\test")
+            
+    if not os.path.exists(dirName):
+        os.makedirs(dirName)
+        print("Directory " , dirName ,  " Created ")
+    else:    
+        print("Directory " , dirName ,  " already exists")    
+        
+    os.chdir(dirName)
+    # print("Current working directory: {0}".format(os.getcwd()))
+
+    save_all_bits_sep(dict_data, dirName) 
 #%% Retrieve raw data, adjust to same timeline, correct mocap etc
 
 # old 
@@ -57,50 +77,65 @@ def file_save(obj, name, save_file, pickle_file):
 # new 
 
 # Input data 
-tpathMoCap = r"E:\ETHZ\mast_sem_IV\pdm\experiment\2021_07_09_BALGRIST\Kanako Cal 02.pkl"
-tpathMS = "bla.pkl"
+tpathMoCap = r"E:\ETHZ\mast_sem_IV\pdm\experiment\2021_07_20\FL1.pkl"
+tpathMS = r"E:\ETHZ\mast_sem_IV\pdm\code\MS_log_191852.pkl"
 
 # enfaite il y a aussi la force 
-test_dpcollect = DataProcessingCollectNEW.data_processing_collect(tpathMoCap, tpathMS, False)
+# test_dpcollect, seg = DataProcessingCollectNEW.data_processing_collect(tpathMoCap, tpathMS, True)
 
-# Save 
-tDPC_outname = "SA_090721_COL_00.pkl"
-file_save(test_dpcollect, tDPC_outname, True, False)
+# # Save 
+# tDPC_outname = "SA_200721_COL_FL1_MS.pkl"
+# file_save(test_dpcollect, tDPC_outname, True, False)
 
 #%% Interpret Mocap data - extract angles 
 
 # Input data
-tDI_filein = r"E:\ETHZ\mast_sem_IV\pdm\code02\SA_090721_COL_00.pkl"
-tDI_datain = op_pickle(tDI_filein)
+tDI_filein = r"E:\ETHZ\mast_sem_IV\pdm\code02\SA_200721_COL_FL1_MS.pkl"
+# tDI_datain = op_pickle(tDI_filein)
 
 # old
 # test_pdint = DataProcessingMCInterpretation.data_processing_interpretation(tDI_datain)
 
 # new 
-test_pdint = DataProcessingMCInterpretationNEW.data_processing_interpretation(tDI_datain, False)
+# test_pdint = DataProcessingMCInterpretationNEW.data_processing_interpretation(tDI_datain, True)
 
-# Save
-tDI_outname = "SA_090721_INT_00.pkl"
-file_save(test_pdint, tDI_outname, True, True)
+# # Save
+# tDI_outname = "SA_200721_INT_FL1_MS.pkl"
+# file_save(test_pdint, tDI_outname, True, True)
 
-# # pr tester si mocap joue bien, peut s'arreter ici ? ou s'arrete apres avoir enlever le offset 
-# # peut etre mettre une fonction plot, juste histoire de vérifier à l'oeil, limite comparer à
-# # données qu'on a déjà 
+
 
 #%% remove offset 
 
-tcut_filein = r"E:\ETHZ\mast_sem_IV\pdm\code02\SA_090721_INT_00.pkl"
-d_in = op_pickle(tcut_filein)
-# d_in = test_pdint
+tcut_filein = r"E:\ETHZ\mast_sem_IV\pdm\code02\SA_200721_INT_FL1_MS.pkl"
+# d_in = op_pickle(tcut_filein)
+# # d_in = test_pdint
 
-DataProcessingFunctions.dyn_remove_offset_bodypart(d_in, "shank")
-DataProcessingFunctions.dyn_remove_offset_bodypart(d_in, "thigh")
+# DataProcessingFunctions.dyn_remove_offset_bodypart(d_in, "shank")
+# DataProcessingFunctions.dyn_remove_offset_bodypart(d_in, "thigh")
 
-DataProcessingFunctions.plot_res_shank(d_in)
-DataProcessingFunctions.plot_res_thigh(d_in)
+# # effacer après 
+# # tcut_filein = r"E:\ETHZ\mast_sem_IV\pdm\code02\SA_200721_FUN_00.pkl"
+# # d_in = op_pickle(tcut_filein)
 
-# Save
-ro_file_name = "SA_090721_FUN_00.pkl"
-file_save(d_in, ro_file_name, True, False)
+# DataProcessingFunctions.plot_res_shank(d_in)
+# DataProcessingFunctions.plot_res_thigh(d_in)
+
+# # Save
+# ro_file_name = "SA_200721_FUN_FL1_MS.pkl"
+# file_save(d_in, ro_file_name, True, False)
+
+
+#%% separate trials 
+
+file1 = r"E:\ETHZ\mast_sem_IV\pdm\code02\SA\SA_200721_FUN_FL3_MS.pkl"
+# file1c = r"S01_cut_Mocap_angles_res"
+data1 = op_pickle(file1)
+dict_of_trials = DataProcessingFunctions.separate_trial(data1)
+
+save_trials_sep("SA_FL3_TEST", dict_of_trials)
+
+
+
 
 

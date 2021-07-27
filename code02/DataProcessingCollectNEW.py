@@ -22,6 +22,9 @@ os.chdir(dname)
 from MoCapPostprocessing import SegmentationNew
 from MoCapPostprocessing import PoseOptimization
 
+# nouveau !! 
+os.chdir(dname)
+
 def data_processing_collect(pathMoCap, pathMS, have_MS_data):
     
     #import MoCap marker cloud
@@ -57,32 +60,45 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
         AlphaShank = np.zeros(len(MyoSuitData))
         AlphaThigh = np.zeros(len(MyoSuitData))
         AlphaTrunk = np.zeros(len(MyoSuitData))
-        EncCount = np.zeros(len(MyoSuitData))
+        # EncCount = np.zeros(len(MyoSuitData))
         CurrentSent = np.zeros(len(MyoSuitData))
         CurrentRead = np.zeros(len(MyoSuitData))
-        
-        ## K
         R_leg = np.zeros(len(MyoSuitData))
         L_leg = np.zeros(len(MyoSuitData))
         Mode = np.zeros(len(MyoSuitData))
+        Force = np.zeros(len(MyoSuitData))
+        ForceLevel = np.zeros(len(MyoSuitData))
+        GyroCThigh = np.zeros(len(MyoSuitData))
+        GyroCShank = np.zeros(len(MyoSuitData))
         
+        # Time 
+        Time = MyoSuitData.tv_sec + MyoSuitData.tv_nsec * 1e-9
+        
+        # Mode_temp
+        sysinf = MyoSuitData.sensorS_StateSysInf - 8
+        Mode_temp = sysinf * MyoSuitData.sensorS_StateSysMode
+        Mode_temp = Mode_temp.replace(0,3)
     
     
         #transform the myosuit data to meaningful units
         for i in range(0,len(MyoSuitData)):
-            syncMS[i] = MyoSuitData.Dummy06[i]
-            timeMS[i]=MyoSuitData.DataTimestamp[i].seconds/1000 #in sec
-            AlphaShank[i] = MyoSuitData.RS_AFlt[i]/1000 #in deg
-            AlphaThigh[i] = MyoSuitData.RT_AFlt[i]/1000 #in deg
-            AlphaTrunk[i] = MyoSuitData.Tr_AFlt[i]/1000 #in deg
-            EncCount[i] = MyoSuitData.RM_Enc[i] #integer numbers
-            CurrentSent[i] = MyoSuitData.RM_CurS[i]/1000 #in Amp
-            CurrentRead[i] = MyoSuitData.RM_CurR[i]/1000  #in Amp
+            syncMS[i] = MyoSuitData.extSensorS_SyncIn[i]
+            timeMS[i]= Time[i] #in sec
+            AlphaShank[i] = MyoSuitData.IMURightShankKalmanAngle[i]/1000 #in deg
+            AlphaThigh[i] = MyoSuitData.IMURightThighKalmanAngle[i]/1000 #in deg
+            AlphaTrunk[i] = MyoSuitData.IMUTrunkKalmanAngle[i]/1000 #in deg
+            # don't have encoder
+            # EncCount[i] = MyoSuitData.RM_Enc[i] #integer numbers
+            CurrentSent[i] = MyoSuitData.CurrentRightMotor[i]/1000 #in Amp
+            CurrentRead[i] = MyoSuitData.ActualCurrentRightMotor[i]/1000  #in Amp
             ##K
-            R_leg[i] = MyoSuitData.R_leg[i]
-            L_leg[i] = MyoSuitData.L_leg[i]
-            Mode[i] = MyoSuitData.Mode[i]
-            
+            R_leg[i] = MyoSuitData.sensorS_StateRightStanceDetection[i]
+            L_leg[i] = MyoSuitData.sensorS_StateLeftStanceDetection[i]
+            Mode[i] = Mode_temp[i]
+            Force[i] = MyoSuitData.extSensorS_Analog0[i]/1000 # pk pas, valeurs enormes sinon
+            ForceLevel[i] = MyoSuitData.sensorS_StateRightForce 
+            GyroCThigh[i] = MyoSuitData.IMURightThighGyroC/1000 
+            GyroCShank[i] = MyoSuitData.IMURightShankGyroC/1000
                 
                    
         print('Loading successful: Myosuit data')
@@ -95,15 +111,16 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
         AlphaShank = AlphaShank[indexMS:]
         AlphaThigh = AlphaThigh[indexMS:]
         AlphaTrunk = AlphaTrunk[indexMS:]
-        EncCount = EncCount[indexMS:]
+        # EncCount = EncCount[indexMS:]
         CurrentSent = CurrentSent[indexMS:]
         CurrentRead = CurrentRead[indexMS:]
-        
-        # K
         R_leg = R_leg[indexMS:]
         L_leg = L_leg[indexMS:]
         Mode = Mode[indexMS:]    
-    
+        Force = Force[indexMS:]
+        ForceLevel = ForceLevel[indexMS:]
+        GyroCThigh = GyroCThigh[indexMS:]
+        GyroCShank = GyroCShank[indexMS:]
                     
         print('Cut-off successful: Myosuit data')
         
@@ -115,25 +132,32 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
         interAShank = itp.interp1d(timeMS,AlphaShank)
         interAThigh = itp.interp1d(timeMS,AlphaThigh)
         interATrunk = itp.interp1d(timeMS,AlphaTrunk)
-        interEC     = itp.interp1d(timeMS,EncCount)
+        # interEC     = itp.interp1d(timeMS,EncCount)
         interCR     = itp.interp1d(timeMS,CurrentRead)
         interCS     = itp.interp1d(timeMS,CurrentSent)
         ##K 
         interR_leg = itp.interp1d(timeMS, R_leg)
         interL_leg = itp.interp1d(timeMS, L_leg)
         interMode = itp.interp1d(timeMS, Mode)
+        interForce = itp.interp1d(timeMS, Force)
+        interFL = itp.interp1d(timeMS, ForceLevel)
+        interGCT = itp.interp1d(timeMS,GyroCThigh)
+        interGCS = itp.interp1d(timeMS,GyroCShank)
     
         
         AlphaShank = interAShank(t)
         AlphaThigh = interAThigh(t)
         AlphaTrunk = interATrunk(t)
-        EncCount   = interEC(t)
+        # EncCount   = interEC(t)
         CurrentRead = interCR(t)
         CurrentSent = interCS(t)  
-        ##K
         R_Leg = interR_leg(t)
         L_Leg = interL_leg(t)
         Mode = interMode(t)
+        Force = interForce(t)
+        ForceLevel = interFL(t)
+        GyroCShank = interGCS(t)
+        GyroCThigh = interGCT(t)
         
         
         print('Interpolation successful: Myosuit data')
@@ -230,12 +254,16 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
         out_dict["AlphaShank"] = AlphaShank[0: len_corr]
         out_dict["AlphaThigh"] = AlphaThigh[0: len_corr]
         out_dict["AlphaTrunk"] = AlphaTrunk[0: len_corr]
-        out_dict["EncCount"] = EncCount[0: len_corr]
+        # out_dict["EncCount"] = EncCount[0: len_corr]
         out_dict["CurrentRead"] = CurrentRead[0: len_corr]
         out_dict["CurrentSent"] = CurrentSent[0: len_corr]
         out_dict["R_leg"] = R_Leg[0: len_corr]
         out_dict["L_leg"] = L_Leg[0: len_corr]
         out_dict["Mode"] = Mode[0: len_corr]
+        out_dict["Force"] = Force[0: len_corr]
+        out_dict["ForceLevel"] = ForceLevel[0: len_corr]
+        out_dict["GyroCThigh"] = GyroCThigh[0: len_corr]
+        out_dict["GyroCShank"] = GyroCShank[0: len_corr]
     
     # ignore labelsMoCap et markerpos - pas utilisé (vu que info est transféré 
     # ds segment) sauf pr la longueur pr la suite - trouver autre façon
@@ -261,4 +289,4 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
    
     print("Data Processing Collect end")
     
-    return out_dict
+    return out_dict, segments

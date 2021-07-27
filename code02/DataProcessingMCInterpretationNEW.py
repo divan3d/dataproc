@@ -215,6 +215,14 @@ def data_processing_interpretation(data_test, have_MS_data):
         temp["current_read"] = data_test["CurrentRead"]
         temp["L_leg"] = data_test["L_leg"]
         temp["R_leg"] = data_test["R_leg"]
+        temp["AlphaShank"] = data_test["AlphaShank"]
+        temp["AlphaThigh"] = data_test["AlphaThigh"]
+        temp["AlphaTrunk"] = data_test["AlphaTrunk"]
+        temp["Mode"] = data_test["Mode"]
+        temp["Force"] = data_test["Force"]
+        temp["ForceLevel"] = data_test["ForceLevel"]
+        temp["GyroCThigh"] = data_test["GyroCThigh"]
+        temp["GyroCShank"] = data_test["GyroCShank"]
     
     df = pd.DataFrame(data = temp)
     
