@@ -223,6 +223,8 @@ def data_processing_interpretation(data_test, have_MS_data):
         temp["ForceLevel"] = data_test["ForceLevel"]
         temp["GyroCThigh"] = data_test["GyroCThigh"]
         temp["GyroCShank"] = data_test["GyroCShank"]
+        temp["AccelAThigh"] = data_test["AccelAThigh"]
+        temp["AccelAShank"] = data_test["AccelAShank"]
     
     df = pd.DataFrame(data = temp)
     

@@ -82,6 +82,11 @@ def find_mode_change(d_in):
     mode_change = d_in["Mode"].shift() != d_in["Mode"]
     idx_mode_change = mode_change.index[mode_change == True].tolist()
     print("nbr of mode changes = %i" %len(idx_mode_change))
+    
+    # plt.figure()
+    # plt.plot(d_in["Mode"])
+    # plt.plot(idx_mode_change, d_in["Mode"][idx_mode_change],"o")
+    
     return idx_mode_change
 
 
@@ -100,6 +105,7 @@ def separate_data(d_in, idx_mode_change):
     dict_data : dict : contains the separated trials
 
     """
+    # normal
     transp = d_in[idx_mode_change[0]: idx_mode_change[1]]
     iso1 = d_in[idx_mode_change[1]: idx_mode_change[5]]
     concentric1 = d_in[idx_mode_change[5]: idx_mode_change[6]]
@@ -107,13 +113,27 @@ def separate_data(d_in, idx_mode_change):
     iso2 = d_in[idx_mode_change[6]: (idx_mode_change[9] + lag_val)]
     concentric2 = d_in[idx_mode_change[9]:]
     dict_data =  {"Transparent" : transp, "Isometric1" : iso1, "Concentric1" : concentric1,
-                 "Isometric2": iso2, "Concentric2" : concentric2}
+                  "Isometric2": iso2, "Concentric2" : concentric2}
+    
+    # test SA 
+    # transp = d_in[idx_mode_change[0]: idx_mode_change[1]]
+    # iso1 = d_in[idx_mode_change[1]: idx_mode_change[5]]
+    # concentric1 = d_in[idx_mode_change[5]: idx_mode_change[6]]
+    # iso2 = d_in[idx_mode_change[6]: (idx_mode_change[11])]
+    # concentric2 = d_in[idx_mode_change[11]:idx_mode_change[12]]
+    # iso3 = d_in[idx_mode_change[12]:idx_mode_change[17]]
+    # concentric3 = d_in[idx_mode_change[17]:]
+    # # transp2 = d_in[idx_mode_change[18]:]
+    # dict_data =  {"Transparent" : transp, "Isometric1" : iso1, "Concentric1" : concentric1,
+    #              "Isometric2": iso2, "Concentric2" : concentric2, "Isometric3" : iso3,
+    #              "Concentric3" : concentric3}
     return dict_data
 
 
 def check_mode(dict_data):    
     """
     prints mean value of mode for each separated trial. 
+    and time and FL values
 
     Parameters
     ----------
@@ -124,12 +144,19 @@ def check_mode(dict_data):
     None.
 
     """
-    print(" checking mode values of separated trials : ")
+    print("Checking values of separated trials : ")
     for key in dict_data:
         mode_check = statistics.mean(dict_data[key]["Mode"])
+        fl_check = statistics.mean(dict_data[key]["ForceLevel"])
+        t_start = dict_data[key]["t"].iloc[0]
+        t_end = dict_data[key]["t"].iloc[-1]
+        tot_t = t_end - t_start
         print( key)
+        print("length of trial : %f" % tot_t)
+        print("mean Force Level : %f" % fl_check)
         print("mean mode : %f" % mode_check)
     return
+
 
 
 # this one that calls all others 
