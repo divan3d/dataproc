@@ -63,6 +63,10 @@ def dyn_remove_offset_bodypart(data_in, body_part):
     # return data_in_copy
     return
 
+def se_fl1(data_in):
+    data_in["no_mc_thigh_angle"] = - data_in["no_mc_thigh_angle"]
+    return
+
 #%% functions to cut trial
 
 def find_mode_change(d_in):
@@ -115,18 +119,24 @@ def separate_data(d_in, idx_mode_change):
     dict_data =  {"Transparent" : transp, "Isometric1" : iso1, "Concentric1" : concentric1,
                   "Isometric2": iso2, "Concentric2" : concentric2}
     
-    # test SA 
+    # special SE_FL5_2
     # transp = d_in[idx_mode_change[0]: idx_mode_change[1]]
     # iso1 = d_in[idx_mode_change[1]: idx_mode_change[5]]
     # concentric1 = d_in[idx_mode_change[5]: idx_mode_change[6]]
-    # iso2 = d_in[idx_mode_change[6]: (idx_mode_change[11])]
-    # concentric2 = d_in[idx_mode_change[11]:idx_mode_change[12]]
+    # iso2 = d_in[idx_mode_change[1]: (idx_mode_change[5])]
+    # concentric2 = d_in[idx_mode_change[5]:]
     # iso3 = d_in[idx_mode_change[12]:idx_mode_change[17]]
     # concentric3 = d_in[idx_mode_change[17]:]
     # # transp2 = d_in[idx_mode_change[18]:]
-    # dict_data =  {"Transparent" : transp, "Isometric1" : iso1, "Concentric1" : concentric1,
-    #              "Isometric2": iso2, "Concentric2" : concentric2, "Isometric3" : iso3,
-    #              "Concentric3" : concentric3}
+    # dict_data =  {
+    #               "Isometric2": iso2, "Concentric2" : concentric2}
+    
+    # SE_FL5_1
+    # transp = d_in[idx_mode_change[0]: idx_mode_change[1]]
+    # iso1 = d_in[idx_mode_change[1]: idx_mode_change[5]]
+    # concentric1 = d_in[idx_mode_change[5]: ]
+    # dict_data =  {"Transparent" : transp, "Isometric1" : iso1, "Concentric1" : concentric1}
+    
     return dict_data
 
 

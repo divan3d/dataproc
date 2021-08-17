@@ -107,7 +107,12 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
                    
         print('Loading successful: Myosuit data')
      
-           
+        # SE_FL5_1
+        # syncMS[6194] = 1       
+        
+        # SE_FL3
+        # syncMS[3232] = 1       
+     
         #=> cut off MyoSuit data
         indexMS = syncMS.argmax()
         
@@ -152,7 +157,10 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
         interACT = itp.interp1d(timeMS,AccelAThigh)
         interACS = itp.interp1d(timeMS,AccelAShank)
     
-        
+        # c'était necessaire pr SD_FL5, parce que données MS se coupent soudainement
+        t = t[t<timeMS[-1]]
+            
+    
         AlphaShank = interAShank(t)
         AlphaThigh = interAThigh(t)
         AlphaTrunk = interATrunk(t)
@@ -256,7 +264,11 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
     lenMS = len(t)
     lenMC = len(segmentscorr[0])
     lenF = len(Ftot_vert_corr)
+    # verifier parce que du coup coupé les valeurs Mocap pr qqes experiences
     len_corr = min(lenMS, lenMC, lenF)
+    
+    #SE_FL5_1
+    # len_corr = 40000
     
     out_dict = {}
     
@@ -282,7 +294,7 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
     
     # ignore principal directions aussi 
     
-    out_dict["time"] = t
+    out_dict["time"] = t[0: len_corr]
     out_dict["vgrf"] = Ftot_vert_corr[0: len_corr]
     out_dict["ShankSegment"] = segmentscorr[0][0: len_corr]
     out_dict["ThighSegment"] = segmentscorr[1][0: len_corr]
@@ -301,4 +313,4 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
    
     print("Data Processing Collect end")
     
-    return out_dict, segments
+    return out_dict, segmentscorr
