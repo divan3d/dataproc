@@ -1,0 +1,8 @@
+compare_models : cross validation pr essayer differents params pr SVR 
+data_prep_svr : splits data into training and test, trains SVR and scores, do this for different features
+essai_gaussian_mixture_model : essayer d'utiliser GMM pr voir si arrivait a séparer les courbes, pr l'instant donnne rien 
+feature_create : fonction pr creer donnees avec les features qu'on veut qui va ensuite etre utiliser par data_prep_svr
+hmm_essai : vide, juste le nom de la librairie et idée de comment pourrait potentiellement faire
+labelise : idée était de séparer les gait cycle entre ceux qui ont rotation du kmau ou pas, mais pas utilisé, pas fini, idées qui pourraient etre ré-utiliser
+noS1 : data_prep_svr qui exclu S1 de l'entrainement
+pseudo_train_test_split : fonction qui sépare les gait cycles de tout les sujets apres avoir melanger les ordres entre ceux pr entrainer et ceux pour tester 

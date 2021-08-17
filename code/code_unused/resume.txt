@@ -1,0 +1,13 @@
+check_new_pipeline : fonction pr verifier que nouvelle facon de faire av DataProcessing et fonctions qui vont avec donnent meme resultat que comment c'etait fait precedemment
+
+biweekly6 : code pour faire des plots pr la presentation, trouve aussi MSE entre les données originales pr pouvoir dire a quel point il y a des erreurs etc 
+
+clean_data_residuals : utile pr plots, aussi pr les nouveaux plots 
+
+error_calc_whole_data : get MSE and median 
+
+error_good_data : butterworth filter, MAE
+
+unused_funtions : unused functions, documented
+
+separate_exp : fonctions ont été copiées dans DataProcessingFunctions, ce sont les fonctions pour séparer transparent, isometrique et concentrique dans l'experience
