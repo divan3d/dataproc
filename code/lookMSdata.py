@@ -41,8 +41,10 @@ def save_obj(obj, name ):
 # filee3 = r"E:\ETHZ\mast_sem_IV\pdm\experiment\MYOSUIT\SE\MS_log_SE_FL3.pkl"
 # data1 = op_pickle(filee3)
 
-filee1 = r"E:\ETHZ\mast_sem_IV\pdm\experiment\MYOSUIT\SE\MS_log_SE_FL1.pkl"
-data1 = op_pickle(filee1)
+# filee1 = r"E:\ETHZ\mast_sem_IV\pdm\experiment\MYOSUIT\SE\MS_log_SE_FL1.pkl"
+file1 = "E:/ETHZ/mast_sem_IV/pdm/experiment/MYOSUIT/SB/MS_log_SB_FL1.pkl"
+# file1 = "C:/Users/ksdiv/Documents/ms_all/MYOSUIT_LOG_2021_08_06_17_04_36.txt"
+data1 = op_pickle(file1)
 
 
 #%%

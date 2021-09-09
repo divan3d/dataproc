@@ -50,26 +50,14 @@ def indices_to_cut_R(d1):
     peak_R_leg = properties["left_edges"]
     return peak_R_leg
 
-def indices_to_cut_L(d1):
-    """
-    finds indices to cut data such that left with ~ heel strike to toe off for 
-    right leg -- corresponds approx. to heel strike right leg to heel strike left leg 
-    Parameters
-    ----------
-    d1 : pd dataframe : dynamic data of 1 subject
-    Returns
-    -------
-    peak_L_leg : array : contains indices of Left leg heel strike 
-    """
-    _, properties = scipy.signal.find_peaks(d1["L_leg"].values, height=1, plateau_size = 5)
-    peak_L_leg = properties["left_edges"]
-    return peak_L_leg
+
 
 def cut_data(d1, delay_idx_r, delay_idx_l, steps_to_cut, nbr_sub):
     """
     cut data such that left with ~ heel strike to toe off for right leg 
     -- corresponds approx. to heel strike right leg to heel strike left leg 
     (s.t) seen from MyoSuit -- corresponds to where force is applied 
+
     Parameters
     ----------
     d1 : pd dataframe : dynamic data of 1 subject
@@ -82,25 +70,14 @@ def cut_data(d1, delay_idx_r, delay_idx_l, steps_to_cut, nbr_sub):
     -------
     dict_cut_data : dict of dataframe : each dict has dataframe of one gait cycle
                         from ~ heel strike to ~ toe off
+
     """
     dict_cut_data = {}
     
     idx_R_leg = indices_to_cut_R(d1)
-    idx_L_leg = indices_to_cut_L(d1)
     
-    # #S6 -- pose les deux pieds en meme temps 
-    if nbr_sub == 6:
-        idx_R_leg = idx_R_leg[1:]
-        idx_L_leg = idx_L_leg[2:]
-    
-    idx_R_leg = idx_R_leg - delay_idx_r
-    idx_L_leg = idx_L_leg + delay_idx_l
-    
-    if idx_L_leg[0] < idx_R_leg[0]:
-        idx_L_leg = idx_L_leg[1:]
-        idx_R_leg = idx_R_leg[:-1]
     for cidx in range(len(idx_R_leg) - 2*steps_to_cut):
-        dict_cut_data[cidx] = d1.iloc[idx_R_leg[cidx + steps_to_cut]: idx_L_leg[cidx + steps_to_cut]]
+        dict_cut_data[cidx] = d1.iloc[idx_R_leg[cidx + steps_to_cut]: idx_R_leg[cidx + 1 + steps_to_cut]]
     
     print("# of gait cycles, initial cut : %f " %len(dict_cut_data))
     
@@ -423,7 +400,7 @@ def keep_good_gc_thigh(data_in):
     nbr_steps_to_cut = 5
     min_val_thigh = 6
             
-    plot_whole(data_in)
+    # plot_whole(data_in)
     # gait cycle coupé dans cette fonction
     dict_data_to_cut = cut_data(data_in, delay_to_cut, delay_to_cut_l, nbr_steps_to_cut, 25)
     if not bool(dict_data_to_cut) :

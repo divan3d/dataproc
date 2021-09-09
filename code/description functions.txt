@@ -1,0 +1,29 @@
+- "cut_into_gait_cycle" : function to use to cut connected data into gait cycles 
+	will call:
+	-  "check_poi_shank" : gets rid of errors for shank , cuts into a little before HS to a little after TO 
+	-  "check_poi_shank_entire_gc" : same but cuts into "whole" gait cycles
+	-  "check_poi_thigh" : same but thigh
+	-  "check_poi_thigh_entire_gc" : same but for thigh
+
+- "check_values" : plots a lot of things comparing MS and MC data to make sure it's aligned, correct etc 
+
+- "data_read" : transforms MS files into pickle, plots a few things 
+
+- "equal_time" : contains functions to have gait cycles interpreted so that they're made to be the same length 
+		plots for midterm presentation 
+
+- "error_calc" : gets MSE for whole data / has functions that can go through whole data etc 
+
+- "look_MS_data" : plots to look at MS data that's been extracted already 
+
+- "midterm" : tried to implement Dynamic Time Warping and then smoothed that but gave bad results so not using it 
+
+- "midterm_data_draw" : draw the plots for the FL and speed varying for midterm 
+
+- "new_data_look" : plots for comparing body, kma, MS
+
+- "no_sync" : function to add sync when missing 
+
+- "static_data" : playing around for static data, old data 
+
+- "visualize_raw_mocap" : plots raw mocap data 

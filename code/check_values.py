@@ -22,11 +22,11 @@ def save_obj(obj, name ):
     with open(name, 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
         
-# file1 = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\SA\SA_FL1\SA_FL1_Concentric1.pkl"
-# data1 = op_pickle(file1)
-
-file1 = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\SC\INTERMEDIATE\SC_FUN_FL1.pkl"
+file1 = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\SA\INTERMEDIATE\SA_FUN_FL5_2.pkl"
 data1 = op_pickle(file1)
+
+# file1 = r"E:/ETHZ/mast_sem_IV/pdm/extracted_data/SC/SC_FL5/SC_FL5_Concentric2.pkl"
+# data1 = op_pickle(file1)
 
 # file2 = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\test\SA_TEST_TEST\SA_TEST_TEST_Concentric2.pkl"
 # data2 = op_pickle(file2)

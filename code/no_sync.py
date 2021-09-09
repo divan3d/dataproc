@@ -26,11 +26,11 @@ def save_obj(obj, name ):
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
 
 #MS
-filee5 = r"E:\ETHZ\mast_sem_IV\pdm\experiment\MYOSUIT\SE\MS_log_SE_FL3.pkl"
+filee5 = r"E:\ETHZ\mast_sem_IV\pdm\experiment\MYOSUIT\SB\MS_log_SB_FL5.pkl"
 data1 = op_pickle(filee5)
 
 #mocap 
-filmce5 = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\SE\INTERMEDIATE\SE_FUN_FL3.pkl"
+filmce5 = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\SB\INTERMEDIATE\SB_FUN_FL5_mc.pkl"
 datamc = op_pickle(filmce5)
 
 #%%
@@ -76,35 +76,35 @@ HallSensor = data1["HallRightMotor"]
 # plt.plot(AlphaShank/10000 - 8)
 # plt.title("E3")
 
-# #%%
-# plt.figure()
-# plt.plot(current_received)
-# plt.plot(AlphaShank)
-# plt.plot(current_sent)
-# plt.title("current")
+#%%
+plt.figure()
+plt.plot(current_received)
+plt.plot(AlphaShank)
+plt.plot(current_sent)
+plt.title("current")
 
-# plt.figure()
-# plt.plot(AlphaShank)
-# plt.plot(AlphaThigh)
-# plt.title("angles imu")
-# # plt.plot(AlphaTrunk)
+plt.figure()
+plt.plot(AlphaShank)
+plt.plot(AlphaThigh)
+plt.title("angles imu")
+# plt.plot(AlphaTrunk)
 
-# #%%
+#%%
 
-# plt.figure()
-# plt.plot(datamc["no_mc_shank_angle"])
-# #%%
-# plt.figure()
-# plt.plot(R_Leg)
-# plt.plot(L_Leg)
+plt.figure()
+plt.plot(datamc["no_mc_shank_angle"])
+#%%
+plt.figure()
+plt.plot(R_Leg)
+plt.plot(L_Leg)
 
-# plt.figure()
-# plt.plot(datamc["vgrf"])
+plt.figure()
+plt.plot(datamc["vgrf"])
 
 #%%
 
 new_sync = sync
-new_sync[3232] = 1 
+new_sync[4400] = 1 
 CurrentSent = current_sent
 CurrentRead = current_received
 R_leg = R_Leg
