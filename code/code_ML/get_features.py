@@ -30,9 +30,14 @@ def save_obj(obj, name ):
     with open(name, 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
         
-file1 = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\test\SA_FL3_TEST"
 
+subject = "SA"
+fl = "FL1"        
+
+file1 = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\\"  + subject + "\\" + subject + "_" + fl
 listfile = os.listdir(file1)
+
+file_cut = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\\"  + subject + "\\" + subject + "_CUT" 
 
 # files in directory listed alphabetically :
     # concentric1
@@ -64,8 +69,11 @@ iso2_features["ex_i2_3"] = 29
 
 #%% concentric
 
-con1 = op_pickle(file1 + "\\" + listfile[0])
-con2 = op_pickle(file1 + "\\" + listfile[1])
+con1_s = op_pickle(file_cut + "\\" + subject + "_" + fl + "_cut_shank_1.pkl")
+con2_s = op_pickle(file_cut + "\\" + subject + "_" + fl + "_cut_shank_2.pkl")
+
+con1_t = op_pickle(file_cut + "\\" + subject + "_" + fl + "_cut_thigh_1.pkl")
+con2_t = op_pickle(file_cut + "\\" + subject + "_" + fl + "_cut_thigh_2.pkl")
 
 #%% 
 
@@ -74,5 +82,12 @@ def add_iso_features_to_concentric(iso_features, concentric_df):
         concentric_df[key] = iso_features[key]
     return
 
-add_iso_features_to_concentric(iso1_features, con1)
-add_iso_features_to_concentric(iso2_features, con2)
+def add_to_dict_con(iso_features, concentric_dict):
+    for key in concentric_dict:
+        add_iso_features_to_concentric(iso_features, concentric_dict[key])
+    return
+
+# add_iso_features_to_concentric(iso1_features, con1)
+# add_iso_features_to_concentric(iso2_features, con2)
+
+# add_to_dict_con(iso1_features, c2)

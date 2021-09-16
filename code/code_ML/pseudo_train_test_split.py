@@ -80,6 +80,19 @@ def get_test_XY(XY_names, test):
     y_test = y_test[1:]
     return X_test, y_test
 
+def get_valid_XY(XY_names, valid):
+    X_valid = np.zeros((1,(len(XY_names)-1)))
+    y_valid = np.array([0])
+    for idx in range(len(valid)):
+        y_valid = np.append(y_valid, valid[idx][XY_names[0]].to_numpy())
+        xtemp = valid[idx][XY_names[1]].to_numpy()
+        for idx_names in range(2,len(XY_names)):
+            xtemp = np.column_stack((xtemp, valid[idx][XY_names[idx_names]].to_numpy()))
+        X_valid = np.append(X_valid,xtemp, axis = 0)
+    X_valid = X_valid[1:,:]
+    y_valid = y_valid[1:]
+    return X_valid, y_valid
+
 
 def train_test_split_pseudo(dict_dict_in, XY_names, test_size, rdm_seed = None):
     """
@@ -128,6 +141,58 @@ def train_test_split_pseudo(dict_dict_in, XY_names, test_size, rdm_seed = None):
     
     return X_train, y_train, X_test, y_test
 
+def train_test_valid_split_pseudo(dict_dict_in, XY_names, test_size, rdm_seed = None):
+    """
+    extracts to numpy and separates values (writen in XY_names) into test/ train / valid
+    of dict which contains for each subject dict of all gait cycles 
+
+    Parameters
+    ----------
+    dict_dict_in : dict : dict of dict, all (usable) gait cycles for one subject
+                        is put into a dict, and all these dict are put into one
+                        dict
+    XY_names : list : names of the columns that want to extract 
+                        !! 1st value : y column, the rest : x (features)
+    test_size : [0, 1] : proportion of gait cycle used to test, divise par 2, l'autre est
+                        utilisé pr validation set
+    rdm_seed : int, optional : seed for random shuffling of gait cycles. The default is None.
+
+    Returns
+    -------
+    X_train : array : contains (1- test_size) of gait cycle features
+    y_train : array : contains (1- test_size) of gait cycle output values
+    X_test : array : contains (test_size/2) of gait cycle features
+    y_test : array : contains (test_size/2) of gait cycle output values
+    X_valid : array : contains (test_size/2) of gait cycle features
+    y_valid : array : contains (test_size/2) of gait cycle output values
+
+    """
+    
+    # get columns specified in XY_names form pd dataframe
+    l_values = dict_to_list(dict_dict_in, XY_names)
+    
+    # randomize order of gait cycles 
+    seed(a = rdm_seed )
+    rdm_keys = list(l_values.keys())  
+    shuffle(rdm_keys)    
+    nbr_gait = len(rdm_keys)
+    L = []
+    for i in rdm_keys:
+        L.append(l_values[i])
+            
+    # separate gait cycles into test/train set     
+    cut_val = int(np.floor((1-test_size)*nbr_gait))
+    cut_2_val = int(np.floor((nbr_gait - cut_val)/2))
+        
+    train = L[:cut_val]
+    test = L[cut_val:(cut_val+cut_2_val)]
+    valid = L[(cut_val+cut_2_val):]
+    
+    X_train, y_train = get_train_XY(XY_names, train)
+    X_test, y_test = get_test_XY(XY_names, test)
+    X_valid, y_valid = get_valid_XY(XY_names, valid)
+    
+    return X_train, y_train, X_test, y_test, X_valid, y_valid
 
 # X_tr, y_tr, X_te, y_te = train_test_split_pseudo(thigh_data, XY_names, test_size)
 
