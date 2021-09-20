@@ -20,6 +20,8 @@ import scipy.signal
 import statistics
 from scipy import stats
 import os
+import re
+import glob
 
 def op_pickle(file):
     with open(file,'rb') as fileopen:
@@ -30,64 +32,142 @@ def save_obj(obj, name ):
     with open(name, 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
         
+def save_in_new_file(dirName, dict_data, name_file):  
+    os.chdir(dir_name_sub)
+            
+    if not os.path.exists(dirName):
+        os.makedirs(dirName)
+        print("Directory " , dirName ,  " Created ")
+    else:    
+        print("Directory " , dirName ,  " already exists")    
+        
+    os.chdir(dirName)
+    # print("Current working directory: {0}".format(os.getcwd()))
 
-subject = "SA"
-fl = "FL1"        
-
-file1 = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\\"  + subject + "\\" + subject + "_" + fl
-listfile = os.listdir(file1)
-
-file_cut = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\\"  + subject + "\\" + subject + "_CUT" 
-
-# files in directory listed alphabetically :
-    # concentric1
-    # concentric2
-    # isometric1
-    # isometric2
-    # transparent 
-
-#%% isometric
-
-iso1 = op_pickle(file1 + "\\" + listfile[2])
-iso2 = op_pickle(file1 + "\\" + listfile[3])
+    save_obj(dict_data, name_file) 
+        
+subject = "SH"
+dir_name_sub = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\\" + subject
+    
+#%% cut and equalized gait cycles
 
 
-# du coup en sortie pourrait avoir une ou deux ou 3 constantes a voir, a mettre 
-# dans données concentriques 
 
-#pourrait faire pr que ça mette ds dictionnaire, comme ça mets direct ds titre
+#%%
 
-iso1_features = {}
+def grad_d(d_in):
+    """
+    gets gradient 
 
-iso1_features["ex_i1_1"] = 23
-iso1_features["ex_i1_2"] = 3
+    """ 
+    grad = np.gradient(d_in)
+    max_grad = max(grad)
+    idx_max_grad = np.argmax(grad)
+    min_grad = min(grad)
+    idx_min_grad = np.argmin(grad)
+    return grad, max_grad, idx_max_grad, min_grad, idx_min_grad
 
-iso2_features = {}
-iso2_features["ex_i2_1"] = 22
-iso2_features["ex_i2_2"] = 111
-iso2_features["ex_i2_3"] = 29
+
+def get_encoder_dyn(d_in):
+    enc = - d_in["HallSensor"]
+    init = enc[0]
+    max_val = max(enc)
+    idx_min_grad = np.argmin(np.gradient(enc))
+    d_in["dyn_eq_enc_init"] = init
+    d_in["dyn_eq_enc_max"] = max_val
+    d_in["dyn_eq_enc_idx_min_deriv"] = idx_min_grad
+    return
+
+
+def get_current_sent_dyn(d_in):
+    min_val = min(d_in["current_read"][:110])
+    offset = 0.2
+    lim_val = min_val + offset
+    nbr_pts = sum(d_in["current_read"] <= lim_val)
+    d_in["dyn_eq_current_read_min"] = min_val
+    d_in["dyn_eq_current_read_width_neg"] = nbr_pts
+    return
+
+#%%
+
+# for shank_f in shank_file:
+#     eq_shank = op_pickle(dir_eq_shank + "//" + shank_f)
+#     for key in eq_shank:
+
+
+#%% features
+
+# sub info 
+dir_sub_info = dir_name_sub + "//" + subject + "_features_sub_info/" + subject + "_features_subject_info.pkl"
+features_sub_info = op_pickle(dir_sub_info)
+
+# uncut dynamic 
+dir_features_uncut_dyn = dir_name_sub + "//" + subject + "_features_dyn_uncut"
+
+# isometric
+dir_features_iso = dir_name_sub + "//" + subject + "_features_ISO"
 
 #%% concentric
 
-con1_s = op_pickle(file_cut + "\\" + subject + "_" + fl + "_cut_shank_1.pkl")
-con2_s = op_pickle(file_cut + "\\" + subject + "_" + fl + "_cut_shank_2.pkl")
-
-con1_t = op_pickle(file_cut + "\\" + subject + "_" + fl + "_cut_thigh_1.pkl")
-con2_t = op_pickle(file_cut + "\\" + subject + "_" + fl + "_cut_thigh_2.pkl")
 
 #%% 
 
-def add_iso_features_to_concentric(iso_features, concentric_df):
-    for key in iso_features: 
-        concentric_df[key] = iso_features[key]
+def add_iso_features_to_concentric(features, concentric_df):
+    for key in features: 
+        concentric_df[key] = features[key]
     return
 
-def add_to_dict_con(iso_features, concentric_dict):
+def add_to_dict_con(concentric_dict):
     for key in concentric_dict:
+        #sub info
+        add_iso_features_to_concentric(features_sub_info, concentric_dict[key])
+        add_iso_features_to_concentric(uncut_dyn_features, concentric_dict[key])
         add_iso_features_to_concentric(iso_features, concentric_dict[key])
+        get_encoder_dyn(concentric_dict[key])
+        get_current_sent_dyn(concentric_dict[key])
     return
 
 # add_iso_features_to_concentric(iso1_features, con1)
 # add_iso_features_to_concentric(iso2_features, con2)
 
 # add_to_dict_con(iso1_features, c2)
+
+#%%
+
+# test_dir = r"E:/ETHZ/mast_sem_IV/pdm/extracted_data/SA/SA_EQ_GC_shank/SA_FL3_cut_shank_2.pkl"
+# test = op_pickle(test_dir)
+
+# add_to_dict_con(test, test)
+
+#%% iso et dyn uncut faut aller chercher le bon fichier a chaque truc 
+
+list_fl_files = glob.glob(dir_name_sub + "\\" + subject + "_FL*")
+
+for fl_by_subject in list_fl_files:
+    fl = fl_by_subject[48:]
+    #get iso features
+    features_iso_path = glob.glob(dir_features_iso + "/features_" + subject + "_FL" + fl + "_cut_Isometric*")
+    for features_iso in features_iso_path:
+        exp_nbr = features_iso[-5]
+        iso_features = op_pickle(features_iso)        
+        # get concentric equal dynamic data
+        dir_eq_shank = dir_name_sub + "//" + subject + "_EQ_GC_shank/" + subject + "_FL" + fl + "_cut_shank_" + exp_nbr + ".pkl"
+        dir_eq_thigh = dir_name_sub + "//" + subject + "_EQ_GC_thigh/" + subject + "_FL" + fl + "_cut_thigh_" + exp_nbr + ".pkl"
+        conc_shank = op_pickle(dir_eq_shank)
+        conc_thigh = op_pickle(dir_eq_thigh)
+        # get uncut dyn features 
+        dir_uncut_features = dir_features_uncut_dyn + "/features_" + subject + "_FL" + fl + "_Concentric" + exp_nbr + ".pkl"
+        uncut_dyn_features = op_pickle(dir_uncut_features)
+        #add features 
+        add_to_dict_con(conc_shank)
+        add_to_dict_con(conc_thigh)
+        save_in_new_file(subject + "_features", conc_shank, "features_fin_shank_" + subject + "_FL" + fl + "_exp" + exp_nbr + ".pkl")
+        save_in_new_file(subject + "_features", conc_thigh, "features_fin_thigh_" + subject + "_FL" + fl + "_exp" + exp_nbr + ".pkl")
+
+
+        
+    
+
+
+
+

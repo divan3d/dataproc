@@ -36,4 +36,4 @@ for sub in subjects_train:
     
 #%% 
 
-save_obj(dict_shank, "shank_gc.pkl")
+save_obj(dict_shank, "new_shank_gc.pkl")

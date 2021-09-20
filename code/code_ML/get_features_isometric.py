@@ -16,7 +16,11 @@ import statistics
 from scipy import stats
 import os
 
-#%% juste la pour tester fonction, mais apres pr ouvrir les fichiers, sera fait dans get_features
+#%%
+subject = "SH"
+dir_name_sub = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\\" + subject
+
+#%% 
 
 def op_pickle(file):
     with open(file,'rb') as fileopen:
@@ -27,24 +31,31 @@ def save_obj(obj, name ):
     with open(name, 'wb') as f:
         pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
         
+def save_in_new_file(dirName, dict_data, name_file):  
+    os.chdir(dir_name_sub)
+            
+    if not os.path.exists(dirName):
+        os.makedirs(dirName)
+        print("Directory " , dirName ,  " Created ")
+    else:    
+        print("Directory " , dirName ,  " already exists")    
+        
+    os.chdir(dirName)
+    # print("Current working directory: {0}".format(os.getcwd()))
 
+    save_obj(dict_data, name_file) 
 
 #%%
 
-f12 = r"E:/ETHZ/mast_sem_IV/pdm/extracted_data/SH/SH_EQ_iso/SH_FL1_cut_Isometric2.pkl"
-d12 = op_pickle(f12)
+dir_eq_iso = r"E:/ETHZ/mast_sem_IV/pdm/extracted_data/" + subject + "//" + subject + "_EQ_iso"
+
 
 #%% dict of features
 
 # input : iso experiment, which has 2 compressions
 # extract these values and save as variable so don't have to retrieve each time
 
-number = f12[-5]
-off1 = d12["iso" + number + "_off_1"]
-off2 = d12["iso" + number + "_off_2"]
-on1 = d12["iso" + number + "_on_1"]
-on2 = d12["iso" + number + "_on_2"]
-dict_features = {}
+
 
 def grad_d(series_in):
     """
@@ -55,7 +66,7 @@ def grad_d(series_in):
     idx_max_grad = np.argmax(grad)
     min_grad = min(grad)
     idx_min_grad = np.argmin(grad)
-    return max_grad, idx_max_grad, min_grad, idx_min_grad
+    return grad, max_grad, idx_max_grad, min_grad, idx_min_grad
 
 
 def get_iso_on_enc_max_min_diff(on_1, on_2):
@@ -99,8 +110,8 @@ def get_iso_off_enc_max_min_diff(off_1, off_2):
     return
 
 def get_iso_on_enc_deriv(on_1, on_2):
-    g_max1, g_max_idx1, g_min1, g_min_idx1 = grad_d(-on_1["HallSensor"])
-    g_max2, g_max_idx2, g_min2, g_min_idx2 = grad_d(-on_2["HallSensor"]) 
+    g, g_max1, g_max_idx1, g_min1, g_min_idx1 = grad_d(-on_1["HallSensor"])
+    g, g_max2, g_max_idx2, g_min2, g_min_idx2 = grad_d(-on_2["HallSensor"]) 
     
     max_val = (g_max1 + g_max2)/2
     max_idx_val = (g_max_idx1 + g_max_idx2)/2
@@ -110,8 +121,8 @@ def get_iso_on_enc_deriv(on_1, on_2):
     return
 
 def get_iso_off_enc_deriv(off_1, off_2):
-    g_max1, g_max_idx1, g_min1, g_min_idx1 = grad_d(-off_1["HallSensor"])
-    g_max2, g_max_idx2, g_min2, g_min_idx2 = grad_d(-off_2["HallSensor"]) 
+    g, g_max1, g_max_idx1, g_min1, g_min_idx1 = grad_d(-off_1["HallSensor"])
+    g, g_max2, g_max_idx2, g_min2, g_min_idx2 = grad_d(-off_2["HallSensor"]) 
     
     min_val = (g_min1 + g_min2)/2
     min_idx_val = (g_min_idx1 + g_min_idx2)/2
@@ -180,7 +191,7 @@ def get_iso_on_gyro_c_t(on_1, on_2):
     dict_features["iso_on_gyro_c_t_width_pos"] = width_pos
     return
 
-def get_iso_off_gyro_c_s(off_1, off_2):
+def get_iso_off_gyro_c(off_1, off_2):
     min_g_1 = off_1["GyroCShank"].min()
     min_g_2 = off_2["GyroCShank"].min()
     min_g = (min_g_1 + min_g_2)/2
@@ -203,11 +214,67 @@ def get_iso_off_gyro_c_s(off_1, off_2):
     dict_features["iso_off_gyro_c_s_idx_max"] = imax_g
     return
 
+def get_iso_on_current_read(on_1, on_2):
+    grad1, maxgrad1, idxmaxgrad1, mingrad1, idxmingrad1 = grad_d(on_1["current_sent"])
+    grad2, maxgrad2, idxmaxgrad2, mingrad2, idxmingrad2 = grad_d(on_2["current_sent"])
+    
+    mingrad = (mingrad1 + mingrad2)/2
+    idxmingrad = (idxmingrad1 + idxmingrad2)/2
+    
+    ggrad1, gmaxgrad1, gidxmaxgrad1, gmingrad1, gidxmingrad1 = grad_d(grad1)
+    ggrad2, gmaxgrad2, gidxmaxgrad2, gmingrad2, gidxmingrad2 = grad_d(grad2)
+    
+    gmaxgrad = (gmaxgrad1 + gmaxgrad2)/2
+    gidxmaxgrad = (gidxmaxgrad1 + gidxmaxgrad2)/2
+    
+    dict_features["iso_on_current_read_min_deriv"] = mingrad
+    dict_features["iso_on_current_read_idx_min_deriv"] = idxmingrad
+    dict_features["iso_on_current_read_max_double_deriv"] = gmaxgrad
+    dict_features["iso_on_current_read_idx_max_double_deriv"] = gidxmaxgrad    
+    return
+
+def get_iso_off_current_read(off_1, off_2):
+    grad1, maxgrad1, idxmaxgrad1, mingrad1, idxmingrad1 = grad_d(off_1["current_sent"])
+    grad2, maxgrad2, idxmaxgrad2, mingrad2, idxmingrad2 = grad_d(off_2["current_sent"])
+    
+    maxgrad = (maxgrad1 + maxgrad2)/2
+    idxmaxgrad = (idxmaxgrad1 + idxmaxgrad2)/2
+    
+    ggrad1, gmaxgrad1, gidxmaxgrad1, gmingrad1, gidxmingrad1 = grad_d(grad1)
+    ggrad2, gmaxgrad2, gidxmaxgrad2, gmingrad2, gidxmingrad2 = grad_d(grad2)
+    
+    gidxmingrad = (gidxmingrad1 + gidxmingrad2)/2
+    gmingrad = (gmingrad1 + gmingrad2)/2
+    
+    dict_features["iso_off_current_read_max_deriv"] = maxgrad
+    dict_features["iso_off_current_read_idx_max_deriv"] = idxmaxgrad
+    dict_features["iso_off_current_read_min_double_deriv"] = gmingrad
+    dict_features["iso_on_current_read_idx_min_double_deriv"] = gidxmingrad    
+    return
 #%%
 
-get_iso_off_enc_deriv(off1, off2)
-get_iso_on_enc_deriv(on1, on2)
-get_iso_off_enc_max_min_diff(off1, off2)
-get_iso_on_enc_max_min_diff(on1, on2)
-get_iso_on_gyro_c_s(on1, on2)
-get_iso_on_gyro_c_t(on1, on2)
+list_files = os.listdir(dir_eq_iso)
+
+for file in list_files:
+    
+    number = file[-5]
+    dict_iso = op_pickle(dir_eq_iso + "//" + file)
+    new_folder = subject + "_features_ISO"
+    
+    off1 = dict_iso["iso" + number + "_off_1"]
+    off2 = dict_iso["iso" + number + "_off_2"]
+    on1 = dict_iso["iso" + number + "_on_1"]
+    on2 = dict_iso["iso" + number + "_on_2"]
+    dict_features = {}
+    
+    get_iso_off_enc_deriv(off1, off2)
+    get_iso_on_enc_deriv(on1, on2)
+    get_iso_off_enc_max_min_diff(off1, off2)
+    get_iso_on_enc_max_min_diff(on1, on2)
+    get_iso_on_gyro_c_s(on1, on2)
+    get_iso_on_gyro_c_t(on1, on2)
+    get_iso_off_gyro_c(off1, off2)
+    get_iso_on_current_read(on1, on2)
+    get_iso_off_current_read(off1, off2)
+    
+    save_in_new_file(new_folder, dict_features, "features_" + file)

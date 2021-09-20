@@ -76,8 +76,16 @@ def cut_data(d1, delay_idx_r, delay_idx_l, steps_to_cut, nbr_sub):
     
     idx_R_leg = indices_to_cut_R(d1)
     
+    # for cidx in range(len(idx_R_leg) - 2*steps_to_cut):
+    #     dict_cut_data[cidx] = d1.iloc[idx_R_leg[cidx + steps_to_cut]: idx_R_leg[cidx + 1 + steps_to_cut]]
+    
+    # with offset 
+    offset = 5 # for 50 ms 
+    idx_r1 = idx_R_leg - offset
+    idx_r2 = idx_R_leg + offset 
+    
     for cidx in range(len(idx_R_leg) - 2*steps_to_cut):
-        dict_cut_data[cidx] = d1.iloc[idx_R_leg[cidx + steps_to_cut]: idx_R_leg[cidx + 1 + steps_to_cut]]
+        dict_cut_data[cidx] = d1.iloc[idx_r1[cidx + steps_to_cut]: idx_r2[cidx + 1 + steps_to_cut]] 
     
     print("# of gait cycles, initial cut : %f " %len(dict_cut_data))
     
