@@ -116,3 +116,66 @@ plot_h(dds52[8])
 plot_h(des12[102])
 plot_h(das12[12])
 
+#%% 
+
+def plot_i(d_in):
+    ax1.plot(d_in["no_mc_shank_angle"], label = "shank ang")
+    # ax2.plot(d_in["HallSensor"], label = "HS")
+    ax2.plot(max(d_in["no_mc_shank_angle"])*np.ones(170), label = "GC")
+    ax3.plot(min(d_in["no_mc_shank_angle"])*np.ones(170), label = "AB")
+    return 
+
+fig, (ax1,ax2, ax3) = plt.subplots(3,1, constrained_layout = True, sharex = True)
+
+plot_i(dbs31[21])
+plot_i(dds52[45])
+plot_i(des12[12])
+plot_i(das12[102])
+plot_i(dbs31[64])
+plot_i(dds52[8])
+plot_i(des12[102])
+plot_i(das12[12])
+#%% 
+
+def plot_j(d_in):
+    ax1.plot(d_in["no_mc_shank_angle"], label = "shank ang")
+    # ax2.plot(d_in["HallSensor"], label = "HS")
+    ax2.plot(d_in["GyroCShank"], label = "GC")
+    ax3.plot(np.gradient(d_in["GyroCShank"]), label = "AB")
+    return 
+
+fig, (ax1,ax2, ax3) = plt.subplots(3,1, constrained_layout = True, sharex = True)
+
+plot_j(dbs31[21])
+plot_j(dds52[45])
+plot_j(des12[12])
+plot_j(das12[102])
+plot_j(dbs31[64])
+plot_j(dds52[8])
+plot_j(des12[102])
+plot_j(das12[12])
+
+#%%
+
+def plot_k(d_in):
+    ax1.plot(d_in["no_mc_shank_angle"], label = "shank ang")
+    # ax2.plot(d_in["HallSensor"], label = "HS")
+    ax2.plot(d_in["Force"], label = "GC")
+    force_on_off = d_in["Force"] > 2 
+    ax3.plot(force_on_off, label = "AB")
+    return 
+
+fig, (ax1,ax2, ax3) = plt.subplots(3,1, constrained_layout = True, sharex = True)
+
+plot_k(dbs31[21])
+plot_k(dds52[45])
+plot_k(des12[12])
+plot_k(das12[102])
+plot_k(dbs31[64])
+plot_k(dds52[8])
+plot_k(des12[102])
+plot_k(das12[12])
+
+
+
+

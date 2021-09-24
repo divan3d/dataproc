@@ -9,6 +9,7 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+import glob
 # import scipy.signal
 
 def op_pickle(file):
@@ -23,17 +24,25 @@ def save_obj(obj, name ):
         
 dict_shank = {}
 counter = 0
-subjects_train = ["SA", "SB", "SD", "SE", "SF"]
+subjects_train = ["SA", "SB", "SD", "SG", "SF", "SE"]
+# SE problematique pr features_dyn_uncut
+
+# subjects_train = ["SC", "SH"]
 
 for sub in subjects_train:
-    temp_dir = r"E:/ETHZ/mast_sem_IV/pdm/extracted_data/" + sub + "//" + sub + "_EQ_GC_shank"
-    temp_list = os.listdir(temp_dir)
+    # temp_dir = r"E:/ETHZ/mast_sem_IV/pdm/extracted_data/" + sub + "//" + sub + "_EQ_GC_shank"
+    temp_dir = r"E:/ETHZ/mast_sem_IV/pdm/extracted_data/" + sub + "//" + sub + "_features"
+    # temp_list = os.listdir(temp_dir)
+    temp_list = glob.glob(temp_dir + "/features_fin_shank*")
     for file in temp_list :
-        whole_dir = temp_dir + "//" + file
-        dict_gc = op_pickle(whole_dir)
-        dict_shank[str(counter)] = dict_gc
-        counter = counter + 1
+        # whole_dir = temp_dir + "//" + file
+        # dict_gc = op_pickle(whole_dir)
+        dict_gc = op_pickle(file)
+        for key in dict_gc:
+            dict_shank[str(counter)] = dict_gc[key]
+            counter = counter + 1
     
 #%% 
 
-save_obj(dict_shank, "new_shank_gc.pkl")
+save_obj(dict_shank, "dict_gait_cycle_shank.pkl")
+
