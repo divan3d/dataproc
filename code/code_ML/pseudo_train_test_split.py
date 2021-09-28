@@ -52,7 +52,8 @@ def dict_to_list(dict_dict_in, XY_names):
     for keys in dict_dict_in:
         get_useful_val_dict(dict_dict_in[keys], dict_val, XY_names)
     return dict_val    
-    
+ 
+#%%   
 def get_train_XY(XY_names, train):
     X_train = np.zeros((1,(len(XY_names)-1)))
     y_train = np.array([0])
@@ -195,4 +196,58 @@ def train_test_valid_split_pseudo(dict_dict_in, XY_names, test_size, rdm_seed = 
     return X_train, y_train, X_test, y_test, X_valid, y_valid
 
 # X_tr, y_tr, X_te, y_te = train_test_split_pseudo(thigh_data, XY_names, test_size)
+
+#%%
+
+def train_test_valid_split_pseudo_2(dict_in, XY_names, test_size, rdm_seed = None):
+    """
+    extracts to numpy and separates values (writen in XY_names) into test/ train / valid
+    of dict which contains for each subject dict of all gait cycles 
+
+    Parameters
+    ----------
+    dict_in : dict : contains dataframes, which are the gait cycles
+    XY_names : list : names of the columns that want to extract 
+                        !! 1st value : y column, the rest : x (features)
+    test_size : [0, 1] : proportion of gait cycle used to test, divise par 2, l'autre est
+                        utilisé pr validation set
+    rdm_seed : int, optional : seed for random shuffling of gait cycles. The default is None.
+
+    Returns
+    -------
+    X_train : array : contains (1- test_size) of gait cycle features
+    y_train : array : contains (1- test_size) of gait cycle output values
+    X_test : array : contains (test_size/2) of gait cycle features
+    y_test : array : contains (test_size/2) of gait cycle output values
+    X_valid : array : contains (test_size/2) of gait cycle features
+    y_valid : array : contains (test_size/2) of gait cycle output values
+
+    """
+        
+    # dict_in has keys0 to len of thingy 
+    l_values = [range(0,len(dict_in))]
+    
+    # randomize order of gait cycles 
+    seed(a = rdm_seed )
+    rdm_keys = list(l_values.keys())  
+    shuffle(rdm_keys)    
+    nbr_gait = len(rdm_keys)
+    L = []
+    for i in rdm_keys:
+        L.append(l_values[i])
+            
+    # separate gait cycles into test/train set     
+    cut_val = int(np.floor((1-test_size)*nbr_gait))
+    cut_2_val = int(np.floor((nbr_gait - cut_val)/2))
+        
+    train = L[:cut_val]
+    test = L[cut_val:(cut_val+cut_2_val)]
+    valid = L[(cut_val+cut_2_val):]
+    
+    X_train, y_train = get_train_XY(XY_names, train)
+    X_test, y_test = get_test_XY(XY_names, test)
+    X_valid, y_valid = get_valid_XY(XY_names, valid)
+    
+    return X_train, y_train, X_test, y_test, X_valid, y_valid
+
 

@@ -51,7 +51,25 @@ dir_name_sub = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\\" + subject
     
 #%% cut and equalized gait cycles
 
+#%% phase 
 
+phase = np.ones(170)
+phase[0:10] = 0
+phase[20:30] = 2
+phase[30:40] = 3
+phase[40:50] = 4
+phase[50:60] = 5
+phase[60:70] = 6
+phase[70:80] = 7
+phase[80:90] = 8
+phase[90:100] = 9
+phase[100:110] = 10
+phase[110:120] = 11
+phase[120:130] = 12
+phase[130:140] = 13
+phase[140:150] = 14
+phase[150:160] = 15
+phase[160:170] = 16
 
 #%%
 
@@ -86,6 +104,16 @@ def get_current_sent_dyn(d_in):
     nbr_pts = sum(d_in["current_read"] <= lim_val)
     d_in["dyn_eq_current_read_min"] = min_val
     d_in["dyn_eq_current_read_width_neg"] = nbr_pts
+    # not current mais bon
+    d_in["dyn_eq_kmal_max"] = max(d_in["no_mc_kmal_angle"])
+    d_in["dyn_eq_kmal_idx_max"] = np.argmax(d_in["no_mc_kmal_angle"])
+    d_in["dyn_eq_kmal_min"] = min(d_in["no_mc_kmal_angle"])
+    d_in["dyn_eq_kmal_idx_min"] = np.argmin(d_in["no_mc_kmal_angle"])
+    d_in["dyn_eq_gyro_s_deriv"] = np.gradient(d_in["GyroCShank"])
+    d_in["dyn_eq_gyro_t_deriv"] = np.gradient(d_in["GyroCThigh"])
+    d_in["dyn_eq_phase"] = phase
+    d_in["dyn_eq_force_on_off"] = d_in["Force"] > 2
+    d_in["dyn_eq_force_on_off"] = d_in["dyn_eq_force_on_off"].astype(int)
     return
 
 #%%
@@ -102,7 +130,7 @@ dir_sub_info = dir_name_sub + "//" + subject + "_features_sub_info/" + subject +
 features_sub_info = op_pickle(dir_sub_info)
 
 # uncut dynamic 
-dir_features_uncut_dyn = dir_name_sub + "//" + subject + "_features_dyn_uncut"
+# dir_features_uncut_dyn = dir_name_sub + "//" + subject + "_features_dyn_uncut"
 
 # isometric
 dir_features_iso = dir_name_sub + "//" + subject + "_features_ISO"
@@ -121,7 +149,8 @@ def add_to_dict_con(concentric_dict):
     for key in concentric_dict:
         #sub info
         add_iso_features_to_concentric(features_sub_info, concentric_dict[key])
-        add_iso_features_to_concentric(uncut_dyn_features, concentric_dict[key])
+        # get rid of cadence since added "InitialLength"
+        # add_iso_features_to_concentric(uncut_dyn_features, concentric_dict[key])
         add_iso_features_to_concentric(iso_features, concentric_dict[key])
         get_encoder_dyn(concentric_dict[key])
         get_current_sent_dyn(concentric_dict[key])
@@ -156,8 +185,8 @@ for fl_by_subject in list_fl_files:
         conc_shank = op_pickle(dir_eq_shank)
         conc_thigh = op_pickle(dir_eq_thigh)
         # get uncut dyn features 
-        dir_uncut_features = dir_features_uncut_dyn + "/features_" + subject + "_FL" + fl + "_Concentric" + exp_nbr + ".pkl"
-        uncut_dyn_features = op_pickle(dir_uncut_features)
+        # dir_uncut_features = dir_features_uncut_dyn + "/features_" + subject + "_FL" + fl + "_Concentric" + exp_nbr + ".pkl"
+        # uncut_dyn_features = op_pickle(dir_uncut_features)
         #add features 
         add_to_dict_con(conc_shank)
         add_to_dict_con(conc_thigh)

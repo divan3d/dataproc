@@ -24,16 +24,16 @@ def save_obj(obj, name ):
         
 dict_shank = {}
 counter = 0
-subjects_train = ["SA", "SB", "SD", "SG", "SF", "SE"]
+# subjects_train = ["SA", "SD", "SG", "SF", "SE", "SH"]#, "SB"]
 # SE problematique pr features_dyn_uncut
 
-# subjects_train = ["SC", "SH"]
+subjects_train = ["SC", "SB"]
 
 for sub in subjects_train:
     # temp_dir = r"E:/ETHZ/mast_sem_IV/pdm/extracted_data/" + sub + "//" + sub + "_EQ_GC_shank"
     temp_dir = r"E:/ETHZ/mast_sem_IV/pdm/extracted_data/" + sub + "//" + sub + "_features"
     # temp_list = os.listdir(temp_dir)
-    temp_list = glob.glob(temp_dir + "/features_fin_shank*")
+    temp_list = glob.glob(temp_dir + "/features_fin_thigh*")
     for file in temp_list :
         # whole_dir = temp_dir + "//" + file
         # dict_gc = op_pickle(whole_dir)
@@ -44,5 +44,5 @@ for sub in subjects_train:
     
 #%% 
 
-save_obj(dict_shank, "dict_gait_cycle_shank.pkl")
+save_obj(dict_shank, "dict_gait_cycle_thigh_only_BC.pkl")
 
