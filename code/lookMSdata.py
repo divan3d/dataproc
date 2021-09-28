@@ -35,16 +35,16 @@ def save_obj(obj, name ):
 # filec1 = r"E:\ETHZ\mast_sem_IV\pdm\experiment\MYOSUIT\SC\MS_log_SC_FL1.pkl"
 # data1 = op_pickle(filec1)
         
-# filec3 = r"E:\ETHZ\mast_sem_IV\pdm\experiment\MYOSUIT\SC\MS_log_SC_FL3.pkl"
+filec3 = r"E:\ETHZ\mast_sem_IV\pdm\experiment\MYOSUIT\SC\MS_log_SC_FL3.pkl"
 # data1 = op_pickle(filec3)
 
 # filee3 = r"E:\ETHZ\mast_sem_IV\pdm\experiment\MYOSUIT\SE\MS_log_SE_FL3.pkl"
 # data1 = op_pickle(filee3)
 
-# filee1 = r"E:\ETHZ\mast_sem_IV\pdm\experiment\MYOSUIT\SE\MS_log_SE_FL1.pkl"
-file1 = "E:/ETHZ/mast_sem_IV/pdm/experiment/MYOSUIT/SB/MS_log_SB_FL1.pkl"
+# file1 = r"E:\ETHZ\mast_sem_IV\pdm\experiment\MYOSUIT\SE\MS_log_SE_FL1.pkl"
+# file1 = "E:/ETHZ/mast_sem_IV/pdm/experiment/MYOSUIT/SB/MS_log_SB_FL1.pkl"
 # file1 = "C:/Users/ksdiv/Documents/ms_all/MYOSUIT_LOG_2021_08_06_17_04_36.txt"
-data1 = op_pickle(file1)
+data1 = op_pickle(filec3)
 
 
 #%%
@@ -85,108 +85,117 @@ HallSensor = data1["HallRightMotor"]
 #%%
 
 plt.figure()
-plt.plot(sync*10)
-plt.plot(R_Leg)
-plt.plot(L_Leg)
-# plt.plot(AlphaShank/10000 - 8)
-plt.title("C5")
-
-#%%
-plt.figure()
-plt.plot(current_received)
+plt.plot(HallSensor, label = "hall")
+plt.plot(AlphaShank/80, label = "shank")
 plt.plot(current_sent)
-plt.title("current")
+plt.plot(current_received)
+plt.legend()
 
-plt.figure()
-plt.plot(AlphaShank)
-plt.plot(AlphaThigh)
-plt.title("angles imu")
+#%%
+
+# plt.figure()
+# plt.plot(sync*10)
+# plt.plot(R_Leg)
+# plt.plot(L_Leg)
+# # plt.plot(AlphaShank/10000 - 8)
+# plt.title("C5")
+
+#%%
+# plt.figure()
+# plt.plot(current_received)
+# plt.plot(current_sent)
+# plt.title("current")
+
+# plt.figure()
+# plt.plot(AlphaShank)
+# plt.plot(AlphaThigh)
+# plt.title("angles imu")
+# # plt.plot(AlphaTrunk)
+
+# plt.figure()
+# plt.plot(sync)
+# plt.title("sync")
+
+# plt.figure()
+# plt.plot(force)
+# plt.title("force")
+
+
+# plt.figure()
+# plt.plot(Mode)
+# plt.title("Mode")
+
+# plt.figure()
+# plt.plot(R_Leg)
+# plt.plot(L_Leg)
+# plt.title(" stance detection")
+
+# plt.figure()
+# plt.plot(time)
+# plt.title("time")
+
+# plt.figure()
+# plt.plot(force_level)
+# plt.title("force level")
+
+#%%
+# plt.figure()
+# plt.plot(AlphaShank/10000)
+# plt.plot(AlphaThigh/10000)
+# plt.title("angles imu")
 # plt.plot(AlphaTrunk)
-
-plt.figure()
-plt.plot(sync)
-plt.title("sync")
-
-plt.figure()
-plt.plot(force)
-plt.title("force")
-
-
-plt.figure()
-plt.plot(Mode)
-plt.title("Mode")
-
-plt.figure()
-plt.plot(R_Leg)
-plt.plot(L_Leg)
-plt.title(" stance detection")
-
-plt.figure()
-plt.plot(time)
-plt.title("time")
-
-plt.figure()
-plt.plot(force_level)
-plt.title("force level")
-
 #%%
-plt.figure()
-plt.plot(AlphaShank/10000)
-plt.plot(AlphaThigh/10000)
-plt.title("angles imu")
-# plt.plot(AlphaTrunk)
-#%%
-plt.figure()
-plt.plot(current_received/1000)
-plt.plot(current_sent/1000)
-plt.plot(sync)
-plt.title("current")
+# plt.figure()
+# plt.plot(current_received/1000)
+# plt.plot(current_sent/1000)
+# plt.plot(sync)
+# plt.title("current")
 
 #%%
 
-plt.figure()
-plt.plot(data1.IMURightShankAccelA/1000 - 5)
+# plt.figure()
+# plt.plot(data1.IMURightShankAccelA/1000 - 5)
+# # plt.plot(data1.IMURightShankAccelB/1000)
+# # plt.plot(data1.IMURightShankAccelC/1000)
+# # plt.plot(R_Leg)
+# # plt.plot(L_Leg)
+# plt.title("Accel A")
+
+#%%
+# plt.figure()
+# # plt.plot(data1.IMURightShankAccelA/1000)
 # plt.plot(data1.IMURightShankAccelB/1000)
+# # plt.plot(data1.IMURightShankAccelC/1000)
+# # plt.plot(R_Leg)
+# # plt.plot(L_Leg)
+# plt.title("Accel B")
+
+#%%
+
+
+# plt.figure()
+# # plt.plot(data1.IMURightShankAccelA/1000)
+# # plt.plot(data1.IMURightShankAccelB/1000)
 # plt.plot(data1.IMURightShankAccelC/1000)
 # plt.plot(R_Leg)
 # plt.plot(L_Leg)
-plt.title("Accel A")
+# plt.title("Accel C")
+
 
 #%%
-plt.figure()
-# plt.plot(data1.IMURightShankAccelA/1000)
-plt.plot(data1.IMURightShankAccelB/1000)
-# plt.plot(data1.IMURightShankAccelC/1000)
+# plt.figure()
+# # plt.plot(data1.IMURightShankAccelA/1000)
+# # plt.plot(data1.IMURightShankAccelB/1000)
+# plt.plot(data1.IMURightThighAccelC/1000)
 # plt.plot(R_Leg)
 # plt.plot(L_Leg)
-plt.title("Accel B")
+# plt.title("Accel C thigh")
 
 #%%
-
-
-plt.figure()
-# plt.plot(data1.IMURightShankAccelA/1000)
-# plt.plot(data1.IMURightShankAccelB/1000)
-plt.plot(data1.IMURightShankAccelC/1000)
-plt.plot(R_Leg)
-plt.plot(L_Leg)
-plt.title("Accel C")
-
-
-#%%
-plt.figure()
-# plt.plot(data1.IMURightShankAccelA/1000)
-# plt.plot(data1.IMURightShankAccelB/1000)
-plt.plot(data1.IMURightThighAccelC/1000)
-plt.plot(R_Leg)
-plt.plot(L_Leg)
-plt.title("Accel C thigh")
-
-#%%
-plt.figure()
-plt.plot(data1.IMURightShankMagA)
-plt.plot(data1.IMURightShankMagB)
-plt.plot(data1.IMURightShankMagC)
+# plt.figure()
+# plt.plot(data1.IMURightShankMagA)
+# plt.plot(data1.IMURightShankMagB)
+# plt.plot(data1.IMURightShankMagC)
 
 #%%
 

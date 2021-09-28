@@ -28,7 +28,7 @@ os.chdir(dname)
 #%% Naming
 
 # change this
-subject = "SH"
+subject = "SB"
 
 # SB doesn't have FL5 ! (fichier existe mais va pas fonctioner )
 
@@ -65,20 +65,15 @@ def save_in_new_file(dirName, dict_data, name_file):
     # print("Current working directory: {0}".format(os.getcwd()))
 
     save_obj(dict_data, name_file) 
-    
-#%% dir 
+    return 
 
-# directory - where to retrieve file 
-# ce qui est un peu relou - nom change 
-dir_name_cut = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\\" + subject + "\\" + subject + "_CUT_EGC"
+#%% dir 
 
 # new file name - a voir 
 new_file_iso = dir_name_sub + "\\" + subject + "_EQ_iso"
 
-
 # get FL files for subject 
 list_fl_files = glob.glob(dir_name_sub + "\\" + subject + "_FL*")
-
 
 
 #%% separate
@@ -136,13 +131,22 @@ def separate_iso2(d_in, idx_to_cut):
     offset_on = 100
     offset_off = 80
         
-    on_1 = d_in[idx_to_cut[0] : (idx_to_cut[0] + offset_on)]
+    # on_1 = d_in[idx_to_cut[0] : (idx_to_cut[0] + offset_on)]
+    # on_1 = on_1.reset_index()
+    # off_1 = d_in[idx_to_cut[1] : (idx_to_cut[1] + offset_off)]
+    # off_1 = off_1.reset_index()
+    # on_2 = d_in[idx_to_cut[2] : (idx_to_cut[2] + offset_on)]
+    # on_2 = on_2.reset_index()
+    # off_2 = d_in[idx_to_cut[3] : (idx_to_cut[3] + offset_off)]
+    # off_2 = off_2.reset_index()
+    
+    on_1 = d_in[idx_to_cut[1] : (idx_to_cut[1] + offset_on)]
     on_1 = on_1.reset_index()
-    off_1 = d_in[idx_to_cut[1] : (idx_to_cut[1] + offset_off)]
+    off_1 = d_in[idx_to_cut[2] : (idx_to_cut[2] + offset_off)]
     off_1 = off_1.reset_index()
-    on_2 = d_in[idx_to_cut[2] : (idx_to_cut[2] + offset_on)]
+    on_2 = d_in[idx_to_cut[3] : (idx_to_cut[3] + offset_on)]
     on_2 = on_2.reset_index()
-    off_2 = d_in[idx_to_cut[3] : (idx_to_cut[3] + offset_off)]
+    off_2 = d_in[idx_to_cut[4] : (idx_to_cut[4] + offset_off)]
     off_2 = off_2.reset_index()
     
     dict_iso1 = {"iso2_on_1" : on_1, "iso2_off_1" : off_1, "iso2_on_2" : on_2, "iso2_off_2" : off_2}

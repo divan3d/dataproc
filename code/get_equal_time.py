@@ -26,7 +26,7 @@ os.chdir(dname)
 #%% Naming
 
 # change this
-subject = "SH"
+subject = "SD"
 
 # directory subject 
 dir_name_sub = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\\" + subject
@@ -58,9 +58,10 @@ def save_in_new_file(dirName, dict_data, name_file):
         
     os.chdir(dirName)
     # print("Current working directory: {0}".format(os.getcwd()))
-
     save_obj(dict_data, name_file) 
-        
+    return
+    
+    
 #%% dir 
 
 # directory
@@ -95,6 +96,8 @@ def dict_equal_time(dict_in, length):
         temp["no_mc_shank_angle"] = get_equal_time(dict_in[key]["no_mc_shank_angle"], length)
         temp["no_mc_kmal_angle"] = get_equal_time(dict_in[key]["no_mc_kmal_angle"], length)
         temp["vgrf"] = get_equal_time(dict_in[key]["vgrf"], length)
+        temp["vgrf1"] = get_equal_time(dict_in[key]["vgrf1"], length)
+        temp["vgrf2"] = get_equal_time(dict_in[key]["vgrf2"], length)
         temp["current_sent"] = get_equal_time(dict_in[key]["current_sent"], length)
         temp["current_read"] = get_equal_time(dict_in[key]["current_read"], length)
         temp["L_leg"] = get_equal_time(dict_in[key]["L_leg"], length)
@@ -104,10 +107,20 @@ def dict_equal_time(dict_in, length):
         temp["Mode"] = get_equal_time(dict_in[key]["Mode"], length)
         temp["Force"] = get_equal_time(dict_in[key]["Force"], length)
         temp["ForceLevel"] = get_equal_time(dict_in[key]["ForceLevel"], length)
+        temp["GyroAThigh"] = get_equal_time(dict_in[key]["GyroAThigh"], length)
+        temp["GyroAShank"] = get_equal_time(dict_in[key]["GyroAShank"], length)
+        temp["GyroBThigh"] = get_equal_time(dict_in[key]["GyroBThigh"], length)
+        temp["GyroBShank"] = get_equal_time(dict_in[key]["GyroBShank"], length)
         temp["GyroCThigh"] = get_equal_time(dict_in[key]["GyroCThigh"], length)
         temp["GyroCShank"] = get_equal_time(dict_in[key]["GyroCShank"], length)
         temp["AccelAThigh"] = get_equal_time(dict_in[key]["AccelAThigh"], length)
         temp["AccelAShank"] = get_equal_time(dict_in[key]["AccelAShank"], length)
+        temp["AccelBThigh"] = get_equal_time(dict_in[key]["AccelBThigh"], length)
+        temp["AccelBShank"] = get_equal_time(dict_in[key]["AccelBShank"], length)
+        temp["AccelCThigh"] = get_equal_time(dict_in[key]["AccelCThigh"], length)
+        temp["AccelCShank"] = get_equal_time(dict_in[key]["AccelCShank"], length)
+        temp["HallSensor"] = get_equal_time(dict_in[key]["HallSensor"], length)
+        temp["InitialLength"] = np.ones(length)*len(dict_in[key])
         eq_d1[key] = pd.DataFrame.from_dict(temp)
     return eq_d1
 
