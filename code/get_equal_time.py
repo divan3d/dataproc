@@ -26,7 +26,7 @@ os.chdir(dname)
 #%% Naming
 
 # change this
-subject = "SD"
+subject = "SH"
 
 # directory subject 
 dir_name_sub = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\\" + subject
@@ -68,16 +68,21 @@ def save_in_new_file(dirName, dict_data, name_file):
 dir_name_cut = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\\" + subject + "\\" + subject + "_CUT_EGC"
 
 # new file name - a voir 
-new_file_shank = dir_name_sub + "\\" + subject + "_EQ_GC_shank"
-new_file_thigh = dir_name_sub + "\\" + subject + "_EQ_GC_thigh"
+# new_file_shank = dir_name_sub + "\\" + subject + "_EQ_GC_shank"
+# new_file_thigh = dir_name_sub + "\\" + subject + "_EQ_GC_thigh"
+new_file_knee = dir_name_sub + "\\" + subject + "_EQ_GC_knee"
 
 # shank file
-shank_dir = dir_name_cut + "/shank"
-shank_list = os.listdir(shank_dir)
+# shank_dir = dir_name_cut + "/shank"
+# shank_list = os.listdir(shank_dir)
 
-# thigh file 
-thigh_dir = dir_name_cut + "/thigh"
-thigh_list = os.listdir(thigh_dir)
+# # thigh file 
+# thigh_dir = dir_name_cut + "/thigh"
+# thigh_list = os.listdir(thigh_dir)
+
+# knee file 
+knee_dir = dir_name_cut + "/knee"
+knee_list = os.listdir(knee_dir)
 
 #%% functions equal time 
 
@@ -95,6 +100,8 @@ def dict_equal_time(dict_in, length):
         temp["no_mc_kmau_angle"] = get_equal_time(dict_in[key]["no_mc_kmau_angle"], length)
         temp["no_mc_shank_angle"] = get_equal_time(dict_in[key]["no_mc_shank_angle"], length)
         temp["no_mc_kmal_angle"] = get_equal_time(dict_in[key]["no_mc_kmal_angle"], length)
+        temp["no_mc_knee_angle"] = get_equal_time(dict_in[key]["no_mc_knee_angle"], length)
+        temp["no_mc_kma_rel_angle"] = get_equal_time(dict_in[key]["no_mc_kma_rel_angle"], length)
         temp["vgrf"] = get_equal_time(dict_in[key]["vgrf"], length)
         temp["vgrf1"] = get_equal_time(dict_in[key]["vgrf1"], length)
         temp["vgrf2"] = get_equal_time(dict_in[key]["vgrf2"], length)
@@ -128,18 +135,24 @@ def dict_equal_time(dict_in, length):
 
 length_gc = 170
 
-for f_name in shank_list:
-    file_now = op_pickle(shank_dir + "/" + f_name) 
-    temp = dict_equal_time(file_now, length_gc)
-    save_in_new_file(new_file_shank, temp, f_name)
+# for f_name in shank_list:
+#     file_now = op_pickle(shank_dir + "/" + f_name) 
+#     temp = dict_equal_time(file_now, length_gc)
+#     save_in_new_file(new_file_shank, temp, f_name)
 
 
 #%%  thigh 
 
-for f_name in thigh_list:
-    file_now = op_pickle(thigh_dir + "/" + f_name) 
-    tempt = dict_equal_time(file_now, length_gc)
-    save_in_new_file(new_file_thigh, tempt, f_name)
+# for f_name in thigh_list:
+#     file_now = op_pickle(thigh_dir + "/" + f_name) 
+#     tempt = dict_equal_time(file_now, length_gc)
+#     save_in_new_file(new_file_thigh, tempt, f_name)
 
+#%%  knee 
+
+for f_name in knee_list:
+    file_now = op_pickle(knee_dir + "/" + f_name) 
+    tempk = dict_equal_time(file_now, length_gc)
+    save_in_new_file(new_file_knee, tempk, f_name)
 
 
