@@ -15,19 +15,17 @@ import DataProcessingMCInterpretation
 import DataProcessingFunctions, DataProcessingCollectNEW
 # import DataProcessingFunctions, DataProcessingCollect 
 import os
-
-# import DataProcessingCollect doit etre à la fin parce que vu que ça va
-# importer plein d'autres fonctions ça arrive pas à importer d'autres fichier
-# vu que ça change le directory -- normalement réparé 
+import matplotlib.pyplot as plt
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
 os.chdir(dname)
 
+
 #%% Naming
 
 # change this
-subject = "SC"
+subject = "SG"
 fl = "FL1"
 
 # directory
@@ -40,8 +38,9 @@ input_myosuit = r"E:\ETHZ\mast_sem_IV\pdm\experiment\MYOSUIT\\" + subject + "\MS
 
 # created files 
 file_collected = subject + "_COL_" + fl + ".pkl"
-file_interpreted = subject + "_INT_" + fl + ".pkl"
-file_function = subject + "_FUN_" + fl + ".pkl"
+file_interpreted = subject + "_INT_KNEE_" + fl + ".pkl"
+file_function = subject + "_FUN_KNEE_" + fl + ".pkl"
+file_smoothed_function = subject + "_FUN_SM_KNEE_" + fl + ".pkl"
 
 #%%
 
@@ -85,7 +84,6 @@ def save_trials_sep(dirName, dict_data):
 
     save_all_bits_sep(dict_data, dirName) 
     
-
 #%% Retrieve raw data, adjust to same timeline, correct mocap etc
 
 # old 
@@ -99,16 +97,16 @@ def save_trials_sep(dirName, dict_data):
 
 # new 
 
-# Input data 
-tpathMoCap = input_mocap
-tpathMS = input_myosuit
+# # Input data 
+# tpathMoCap = input_mocap
+# tpathMS = input_myosuit
 
-# # enfaite il y a aussi la force 
-test_dpcollect, seg = DataProcessingCollectNEW.data_processing_collect(tpathMoCap, tpathMS, True)
+# # # enfaite il y a aussi la force 
+# test_dpcollect, seg = DataProcessingCollectNEW.data_processing_collect(tpathMoCap, tpathMS, True)
 
-# # # Save 
-tDPC_outname = file_collected
-file_save(test_dpcollect, tDPC_outname, True, False)
+# # # # Save 
+# tDPC_outname = file_collected
+# file_save(test_dpcollect, tDPC_outname, True, False)
 
 #%% Interpret Mocap data - extract angles 
 
@@ -122,45 +120,129 @@ tDI_datain = op_pickle(tDI_filein)
 # # new 
 test_pdint = DataProcessingMCInterpretationNEW.data_processing_interpretation(tDI_datain, True)
 
-# # Save
+# # # Save
 tDI_outname = file_interpreted
 file_save(test_pdint, tDI_outname, True, True)
 
+# import matplotlib.pyplot as plt
+# fig, (ax1,ax2, ax3) = plt.subplots(3,1, constrained_layout = True, sharex = True)
+# ax1.plot(test_pdint["mc_shank_angle"])
+# ax1.plot(test_pdint["mc_kmal_angle"])
+# ax2.plot(test_pdint["mc_knee_angle"])
+# ax2.plot(test_pdint["mc_kma_rel_angle"])
+# ax3.plot(test_pdint["mc_thigh_angle"])
+# ax3.plot(test_pdint["mc_kmau_angle"])
 
 
 #%% remove offset 
 
 tcut_filein = dir_name_int + "\\" + file_interpreted
 d_in = op_pickle(tcut_filein)
-# # d_in = test_pdint
+# d_in = test_pdint
 
-DataProcessingFunctions.dyn_remove_offset_bodypart(d_in, "shank")
-DataProcessingFunctions.dyn_remove_offset_bodypart(d_in, "thigh")
+DataProcessingFunctions.dyn_remove_offset_bodypart2(d_in, "shank")
+DataProcessingFunctions.dyn_remove_offset_bodypart2(d_in, "thigh")
 
-# SE_FL1 et SC_FL1 - si thigh est inversé 
+# knee SC_FL3
+# DataProcessingFunctions.sc_fl3(d_in)
+# knee
+DataProcessingFunctions.dyn_remove_offset_bodypart2(d_in, "knee")
+
+# SE_FL1 et SC_FL1, SH_FL3 - si thigh est inversé 
 # DataProcessingFunctions.se_fl1(d_in)
 
 
-DataProcessingFunctions.plot_res_shank(d_in)
-DataProcessingFunctions.plot_res_thigh(d_in)
 
-# Save
+# DataProcessingFunctions.plot_res_shank(d_in)
+# DataProcessingFunctions.plot_res_thigh(d_in)
+# DataProcessingFunctions.plot_res_knee(d_in)
+
+# smooth HallSensor, current sent and read
+
+DataProcessingFunctions.smooth_in_data(d_in)
+
+fig, (ax1,ax2, ax3, ax4) = plt.subplots(4,1, constrained_layout = True, sharex = True)
+ax1.plot(d_in["no_mc_shank_angle"])
+ax1.plot(d_in["no_mc_kmal_angle"])
+ax2.plot(d_in["no_mc_knee_angle"])
+ax2.plot(d_in["no_mc_kma_rel_angle"])
+ax3.plot(d_in["no_mc_thigh_angle"])
+ax3.plot(d_in["no_mc_kmau_angle"])
+ax4.plot(d_in["Mode"])
+
+
+# # Save
 ro_file_name = file_function
+ro_file_name = file_smoothed_function
 file_save(d_in, ro_file_name, True, True)
 
-#%% separate trials (need MS data)
+#%%
 
-file1 = dir_name_int + "\\" + file_function
-# file1c = r"S01_cut_Mocap_angles_res"
+# tcut_filein = dir_name_int + "\\" + file_interpreted
+# d_in = op_pickle(tcut_filein)
+# # d_in = test_pdint
+
+# DataProcessingFunctions.dyn_remove_offset_bodypart(d_in, "shank")
+# DataProcessingFunctions.dyn_remove_offset_bodypart(d_in, "thigh")
+
+# # knee SC_FL3
+# DataProcessingFunctions.sc_fl3(d_in)
+# # knee
+# DataProcessingFunctions.dyn_remove_offset_bodypart(d_in, "knee")
+
+# # SE_FL1 et SC_FL1, SH_FL3 - si thigh est inversé 
+# DataProcessingFunctions.se_fl1(d_in)
+
+
+
+# # DataProcessingFunctions.plot_res_shank(d_in)
+# # DataProcessingFunctions.plot_res_thigh(d_in)
+# # DataProcessingFunctions.plot_res_knee(d_in)
+
+# # smooth HallSensor, current sent and read
+
+# DataProcessingFunctions.smooth_in_data(d_in)
+
+# fig, (ax1,ax2, ax3, ax4) = plt.subplots(4,1, constrained_layout = True, sharex = True)
+# ax1.plot(d_in["no_mc_shank_angle"])
+# ax1.plot(d_in["no_mc_kmal_angle"])
+# ax2.plot(d_in["no_mc_knee_angle"])
+# ax2.plot(d_in["no_mc_kma_rel_angle"])
+# ax3.plot(d_in["no_mc_thigh_angle"])
+# ax3.plot(d_in["no_mc_kmau_angle"])
+# ax4.plot(d_in["Mode"])
+
+# %% separate trials (need MS data)
+
+# file1 = dir_name_int + "\\" + file_function
+file1 = dir_name_int + "\\" + file_smoothed_function
 data1 = op_pickle(file1)
 dict_of_trials = DataProcessingFunctions.separate_trial(data1)
 
+#plot
+DataProcessingFunctions.plot_sep_trials(dict_of_trials)
+
 save_trials_sep(subject + "_" + fl, dict_of_trials)
+print(os.getcwd())
 os.chdir(dname)
 
+#%%
+
+# import matplotlib.pyplot as plt
+# plt.figure()
+# plt.plot(d_in["HallSensor"])
+# plt.plot(d_in["Mode"])
+# plt.plot(d_in["no_mc_shank_angle"])
+# plt.plot(d_in["current_sent"])
+# plt.plot(d_in["current_read"])
 
 
+# # #%%
 
-
-
+# plt.figure()
+# plt.plot(dict_of_trials["Concentric1"]["HallSensor"])
+# plt.plot(dict_of_trials["Concentric1"]["Mode"])
+# plt.plot(dict_of_trials["Concentric1"]["no_mc_shank_angle"])
+# plt.plot(dict_of_trials["Concentric1"]["current_sent"])
+# plt.plot(dict_of_trials["Concentric1"]["current_read"])
 

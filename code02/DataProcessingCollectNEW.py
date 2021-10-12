@@ -46,6 +46,8 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
     
     #calculate total ground reaction force
     Ftot_vert = vgrf[2,:] + vgrf[8,:]
+    vgrf1 = vgrf[2,:]
+    vgrf2 = vgrf[8,:]
     
     print('Loading successful: Motion Capture Data')
     
@@ -73,6 +75,19 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
         AccelAThigh = np.zeros(len(MyoSuitData))
         AccelAShank = np.zeros(len(MyoSuitData))
         
+        #Andri 
+        GyroAThigh = np.zeros(len(MyoSuitData))
+        GyroAShank = np.zeros(len(MyoSuitData))
+        GyroBThigh = np.zeros(len(MyoSuitData))
+        GyroBShank = np.zeros(len(MyoSuitData))
+        AccelBThigh = np.zeros(len(MyoSuitData))
+        AccelBShank = np.zeros(len(MyoSuitData))
+        AccelCThigh = np.zeros(len(MyoSuitData))
+        AccelCShank = np.zeros(len(MyoSuitData))
+        
+        #Hall sensors
+        HallSensor = np.zeros(len(MyoSuitData))
+        
         # Time 
         Time = MyoSuitData.tv_sec + MyoSuitData.tv_nsec * 1e-9
         
@@ -90,7 +105,7 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
             AlphaThigh[i] = MyoSuitData.IMURightThighKalmanAngle[i]/1000 #in deg
             AlphaTrunk[i] = MyoSuitData.IMUTrunkKalmanAngle[i]/1000 #in deg
             # don't have encoder
-            # EncCount[i] = MyoSuitData.RM_Enc[i] #integer numbers
+            # EncCount[i] = MyoSuitData.RM_Enc[i] #integer numbers - faudra utiliser hall sensors ? 
             CurrentSent[i] = MyoSuitData.CurrentRightMotor[i]/1000 #in Amp
             CurrentRead[i] = MyoSuitData.ActualCurrentRightMotor[i]/1000  #in Amp
             ##K
@@ -99,10 +114,23 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
             Mode[i] = Mode_temp[i]
             Force[i] = MyoSuitData.extSensorS_Analog0[i]/1000 # pk pas, valeurs enormes sinon
             ForceLevel[i] = MyoSuitData.sensorS_StateRightForce[i] 
-            GyroCThigh[i] = MyoSuitData.IMURightThighGyroC[i]/1000 
-            GyroCShank[i] = MyoSuitData.IMURightShankGyroC[i]/1000
-            AccelAThigh[i] = MyoSuitData.IMURightThighAccelA[i]/1000 
-            AccelAShank[i] = MyoSuitData.IMURightShankAccelA[i]/1000
+            GyroCThigh[i] = MyoSuitData.IMURightThighGyroC[i]*0.0175
+            GyroCShank[i] = MyoSuitData.IMURightShankGyroC[i]*0.0175
+            AccelAThigh[i] = MyoSuitData.IMURightThighAccelA[i]/4096
+            AccelAShank[i] = MyoSuitData.IMURightShankAccelA[i]/4096
+            
+            # Andri 
+            GyroAThigh[i] = MyoSuitData.IMURightThighGyroA[i]*0.0175
+            GyroAShank[i] = MyoSuitData.IMURightShankGyroA[i]*0.0175
+            AccelBThigh[i] = MyoSuitData.IMURightThighAccelB[i]/4096 
+            AccelBShank[i] = MyoSuitData.IMURightShankAccelB[i]/4096
+            GyroBThigh[i] = MyoSuitData.IMURightThighGyroB[i]*0.0175
+            GyroBShank[i] = MyoSuitData.IMURightShankGyroB[i]*0.0175
+            AccelCThigh[i] = MyoSuitData.IMURightThighAccelC[i]/4096 
+            AccelCShank[i] = MyoSuitData.IMURightShankAccelC[i]/4096
+            
+            # Hall Sensors
+            HallSensor[i] = MyoSuitData.HallRightMotor[i]
                 
                    
         print('Loading successful: Myosuit data')
@@ -132,6 +160,18 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
         GyroCShank = GyroCShank[indexMS:]
         AccelAThigh = AccelAThigh[indexMS:]
         AccelAShank = AccelAShank[indexMS:]
+        
+        # Andri 
+        GyroAThigh = GyroAThigh[indexMS:]
+        GyroAShank = GyroAShank[indexMS:]
+        AccelBThigh = AccelBThigh[indexMS:]
+        AccelBShank = AccelBShank[indexMS:]
+        GyroBThigh = GyroBThigh[indexMS:]
+        GyroBShank = GyroBShank[indexMS:]
+        AccelCThigh = AccelCThigh[indexMS:]
+        AccelCShank = AccelCShank[indexMS:]
+        
+        HallSensor = HallSensor[indexMS:]
                     
         print('Cut-off successful: Myosuit data')
         
@@ -154,8 +194,20 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
         interFL = itp.interp1d(timeMS, ForceLevel)
         interGCT = itp.interp1d(timeMS,GyroCThigh)
         interGCS = itp.interp1d(timeMS,GyroCShank)
-        interACT = itp.interp1d(timeMS,AccelAThigh)
-        interACS = itp.interp1d(timeMS,AccelAShank)
+        interAAT = itp.interp1d(timeMS,AccelAThigh)
+        interAAS = itp.interp1d(timeMS,AccelAShank)
+        
+        #Andri 
+        interGAT = itp.interp1d(timeMS,GyroAThigh)
+        interGAS = itp.interp1d(timeMS,GyroAShank)
+        interABT = itp.interp1d(timeMS,AccelBThigh)
+        interABS = itp.interp1d(timeMS,AccelBShank)
+        interGBT = itp.interp1d(timeMS,GyroBThigh)
+        interGBS = itp.interp1d(timeMS,GyroBShank)
+        interACT = itp.interp1d(timeMS,AccelCThigh)
+        interACS = itp.interp1d(timeMS,AccelCShank)
+        
+        interHS = itp.interp1d(timeMS, HallSensor)
     
         # c'était necessaire pr SD_FL5, parce que données MS se coupent soudainement
         t = t[t<timeMS[-1]]
@@ -174,9 +226,20 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
         ForceLevel = interFL(t)
         GyroCShank = interGCS(t)
         GyroCThigh = interGCT(t)
-        AccelAShank = interACS(t)
-        AccelAThigh = interACT(t)
+        AccelAShank = interAAS(t)
+        AccelAThigh = interAAT(t)
         
+        # andri 
+        GyroAShank = interGAS(t)
+        GyroAThigh = interGAT(t)
+        AccelBShank = interABS(t)
+        AccelBThigh = interABT(t)
+        GyroBShank = interGBS(t)
+        GyroBThigh = interGBT(t)
+        AccelCShank = interACS(t)
+        AccelCThigh = interACT(t)
+        
+        HallSensor = interHS(t)
         
         print('Interpolation successful: Myosuit data')
     
@@ -188,6 +251,20 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
             Ftot_vert_corr[i]=-np.sum(Ftot_vert[10*i:])/(len(Ftot_vert)-10*i)
         elif 10*i+10 <= len(Ftot_vert):
             Ftot_vert_corr[i]=-np.sum(Ftot_vert[10*i:10*i+10])/10
+            
+    vgrf1_corr = np.zeros(len(t))
+    for i in range(0,len(t)):
+        if 10*i+10 > len(vgrf1):
+            vgrf1_corr[i]=-np.sum(vgrf1[10*i:])/(len(vgrf1)-10*i)
+        elif 10*i+10 <= len(vgrf1):
+            vgrf1_corr[i]=-np.sum(vgrf1[10*i:10*i+10])/10
+            
+    vgrf2_corr = np.zeros(len(t))
+    for i in range(0,len(t)):
+        if 10*i+10 > len(vgrf2):
+            vgrf2_corr[i]=-np.sum(vgrf2[10*i:])/(len(vgrf2)-10*i)
+        elif 10*i+10 <= len(vgrf2):
+            vgrf2_corr[i]=-np.sum(vgrf2[10*i:10*i+10])/10
         
     
     #split MoCap data into segments
@@ -288,6 +365,18 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
         out_dict["GyroCShank"] = GyroCShank[0: len_corr]
         out_dict["AccelAThigh"] = AccelAThigh[0: len_corr]
         out_dict["AccelAShank"] = AccelAShank[0: len_corr]
+        
+        #andri
+        out_dict["GyroAThigh"] = GyroAThigh[0: len_corr]
+        out_dict["GyroAShank"] = GyroAShank[0: len_corr]
+        out_dict["AccelBThigh"] = AccelBThigh[0: len_corr]
+        out_dict["AccelBShank"] = AccelBShank[0: len_corr]
+        out_dict["GyroBThigh"] = GyroBThigh[0: len_corr]
+        out_dict["GyroBShank"] = GyroBShank[0: len_corr]
+        out_dict["AccelCThigh"] = AccelCThigh[0: len_corr]
+        out_dict["AccelCShank"] = AccelCShank[0: len_corr]
+        
+        out_dict["HallSensor"] = HallSensor[0: len_corr]
     
     # ignore labelsMoCap et markerpos - pas utilisé (vu que info est transféré 
     # ds segment) sauf pr la longueur pr la suite - trouver autre façon
@@ -309,6 +398,9 @@ def data_processing_collect(pathMoCap, pathMS, have_MS_data):
     out_dict["ResNormKMAup"] = res_norm_allseg[3][0: len_corr]
     out_dict["ResNormTDU"] = res_norm_allseg[4][0: len_corr]
     out_dict["ResNormShoulders"] = res_norm_allseg[5][0: len_corr]
+    
+    out_dict["vgrf1"] = vgrf1_corr[0: len_corr]
+    out_dict["vgrf2"] = vgrf2_corr[0: len_corr]
 
    
     print("Data Processing Collect end")

@@ -48,6 +48,9 @@ def dyn_remove_offset_bodypart(data_in, body_part):
     if body_part == "thigh":
         kma = "mc_kmau_angle"
         part = "mc_thigh_angle"
+    elif body_part == "knee":
+        kma = "mc_kma_rel_angle"
+        part = "mc_knee_angle"
         
     mean1 = statistics.mean(data_in[kma][3:400])
     mean2 = statistics.mean(data_in[part][3:400])
@@ -63,8 +66,74 @@ def dyn_remove_offset_bodypart(data_in, body_part):
     # return data_in_copy
     return
 
+def dyn_remove_offset_bodypart2(data_in, body_part):
+    """
+    will get rid of the offset between the extraced angles from mocap data for 
+    thigh/kmau or shank/kmal - so that can compare angles better
+    for dynamic data works well, for static data better to remove offset for
+    each position separately 
+    
+    change so that do this when subject is standing during isometric 
+
+    Parameters
+    ----------
+    data_in : pd dataframe : dynamic experiment for one subject 
+    body_part : "thigh" / "shank"
+
+    Returns
+    -------
+    None. (changes data frame directly)
+
+    """
+    
+    kma = "mc_kmal_angle"
+    part = "mc_shank_angle"
+    if body_part == "thigh":
+        kma = "mc_kmau_angle"
+        part = "mc_thigh_angle"
+    elif body_part == "knee":
+        kma = "mc_kma_rel_angle"
+        part = "mc_knee_angle"
+        
+    # probleme la c'est que ça prend tranparent - pas ce qu'on veut
+    # 
+    # temp = data_in[7500:51000]
+    #SF
+    # temp = data_in[8200:51000]
+    # temp = data_in[2600:20000]
+    #SF FL5_2
+    # temp2 = data_in[34500:37000]
+    # temp.append(temp2)
+    # temp = data_in[7500:]
+    temp = data_in[7500:50000]
+    # SF FL5_1
+    # temp = data_in[7750:51000]
+    # SF FL3_2
+    # temp = data_in[3600:]
+    #♣SE_FL5_2
+    # temp = data_in[2:]
+    temp = temp.loc[temp["Mode"] == 3]
+    temp = temp.loc[temp["GyroCShank"]<= 1.1]
+    temp = temp.loc[temp["GyroCShank"] >= 0.9]
+        
+    mean1 = statistics.median(temp[kma])
+    mean2 = statistics.median(temp[part])
+    
+    data_in["no_"+kma] = data_in[kma] - mean1
+    data_in["no_"+part] = data_in[part] - mean2
+
+    
+    # return data_in_copy
+    return
+
+
+
 def se_fl1(data_in):
     data_in["no_mc_thigh_angle"] = - data_in["no_mc_thigh_angle"]
+    return
+
+def sc_fl3(data_in):
+    data_in["mc_knee_angle"] = - data_in["mc_knee_angle"]
     return
 
 #%% functions to cut trial
@@ -119,23 +188,68 @@ def separate_data(d_in, idx_mode_change):
     dict_data =  {"Transparent" : transp, "Isometric1" : iso1, "Concentric1" : concentric1,
                   "Isometric2": iso2, "Concentric2" : concentric2}
     
-    # special SE_FL5_2
+    # SB FL3
     # transp = d_in[idx_mode_change[0]: idx_mode_change[1]]
     # iso1 = d_in[idx_mode_change[1]: idx_mode_change[5]]
     # concentric1 = d_in[idx_mode_change[5]: idx_mode_change[6]]
-    # iso2 = d_in[idx_mode_change[1]: (idx_mode_change[5])]
-    # concentric2 = d_in[idx_mode_change[5]:]
-    # iso3 = d_in[idx_mode_change[12]:idx_mode_change[17]]
-    # concentric3 = d_in[idx_mode_change[17]:]
-    # # transp2 = d_in[idx_mode_change[18]:]
-    # dict_data =  {
+    # lag_val = idx_mode_change[8] - idx_mode_change[7]
+    # iso2 = d_in[idx_mode_change[8]: (idx_mode_change[9] + lag_val)]
+    # concentric2 = d_in[idx_mode_change[11]:]
+    # dict_data =  {"Transparent" : transp, "Isometric1" : iso1, "Concentric1" : concentric1,
     #               "Isometric2": iso2, "Concentric2" : concentric2}
     
-    # SE_FL5_1
+    # special SE_FL5_2 
+    # iso1 = d_in[idx_mode_change[1]: idx_mode_change[5]]
+    # concentric1 = d_in[idx_mode_change[5]: ]
+    # dict_data =  {
+    #               "Isometric2": iso1, "Concentric2" : concentric1}
+    
+    # SE_FL5_1, SF_FL5_1, (SA_FL1_2)
     # transp = d_in[idx_mode_change[0]: idx_mode_change[1]]
     # iso1 = d_in[idx_mode_change[1]: idx_mode_change[5]]
     # concentric1 = d_in[idx_mode_change[5]: ]
     # dict_data =  {"Transparent" : transp, "Isometric1" : iso1, "Concentric1" : concentric1}
+    
+    # SF_FL3_2
+    # transp = d_in[idx_mode_change[0]: idx_mode_change[1]]
+    # iso2 = d_in[idx_mode_change[1]: idx_mode_change[5]]
+    # concentric2 = d_in[idx_mode_change[5]: ]
+    # dict_data =  {"Transparent2" : transp, "Isometric2" : iso2, "Concentric2" : concentric2}
+    #SG_FL5_2 , 
+    # transp = d_in[idx_mode_change[0]: idx_mode_change[1]]
+    # iso2 = d_in[idx_mode_change[1]: idx_mode_change[5]]
+    # concentric2 = d_in[idx_mode_change[5]: idx_mode_change[6]]
+    # dict_data =  {"Transparent2" : transp, "Isometric2" : iso2, "Concentric2" : concentric2}
+    
+    # get different iso cuts 
+    offset = 80
+    
+    #normal
+    #SA_FL3, SA_FL1, SE_FL1
+    # iso1 = d_in[(idx_mode_change[1] - offset) : idx_mode_change[5]]
+    # iso2 = d_in[idx_mode_change[6] - offset : (idx_mode_change[9] + offset)]
+    # dict_data =  {"Isometric1" : iso1, "Isometric2": iso2}
+    
+    
+     # SE_FL5_1, SF_FL5_1, SA_FL1_2, SE_FL5_2, SF_FL3_2, SG_FL5_2, SE_FL5_2
+    # iso1 = d_in[(idx_mode_change[1] - offset) : idx_mode_change[5]]
+    # iso2 = d_in[(idx_mode_change[1] - offset) : idx_mode_change[5]]
+    # # dict_data =  {"Isometric1" : iso1}
+    # dict_data =  {"Isometric2" : iso1}
+    
+    # SA_FL5_2, SD_FL5, SE_FL3, SF_FL1, SF_FL5_2, SG_FL1, SG_FL3, SG_FL5_1,SH_FL5
+    # # SH_FL1, SH_FL3, SH_FL5, SB_FL1, SC_FL1, SC_FL3, SC_FL5
+    iso1 = d_in[(idx_mode_change[1] - offset) : idx_mode_change[5]]
+    iso2 = d_in[idx_mode_change[7]- offset: (idx_mode_change[10] + offset)]
+    # dict_data =  {"Isometric1" : iso1, "Isometric2": iso2}
+    
+    # SB_FL3
+    # iso1 = d_in[(idx_mode_change[1] - offset) : idx_mode_change[5]]
+    # iso2 = d_in[idx_mode_change[8]- offset: (idx_mode_change[11] + offset)]
+    # dict_data =  {"Isometric1" : iso1, "Isometric2": iso2}
+
+    dict_data["Isometric1"] = iso1
+    dict_data["Isometric2"] = iso2
     
     return dict_data
 
@@ -198,7 +312,38 @@ def save_all_bits_sep(dict_data, dirName):
         save_obj(dict_data[key], tmp_name)
     return
 
+# smooth Hall Sensor and current sent and read
+
+def smooth_d(data_in, what):
+    """
+    hann window
+
+    """
+    win = scipy.signal.windows.hann(20)
+    filtered = scipy.signal.convolve(data_in[what], win, mode = "same")/ sum(win)
+    return filtered
+
+def smooth_in_data(whole_data):
+    filt_HS = smooth_d(whole_data, "HallSensor")
+    filt_CS = smooth_d(whole_data, "current_sent")
+    filt_CR = smooth_d(whole_data, "current_read")
+    
+    whole_data["HallSensor"] = filt_HS
+    whole_data["current_sent"] = filt_CS
+    whole_data["current_read"] = filt_CR
+    
+    return
+
 #%% plots
+
+def plot_sep_trials(separated_data):
+    for key in separated_data:
+        plt.figure()
+        plt.plot(separated_data[key]["current_sent"], label = "current sent")
+        plt.plot(separated_data[key]["no_mc_shank_angle"], label = "shank mocap")
+        plt.plot(separated_data[key]["Mode"], label = "Mode")
+        plt.legend()
+        plt.title(key)
 
 def plot_sep(ex_dict):
     """
@@ -261,6 +406,21 @@ def plot_res_thigh(d1):
     # plt.plot(d1["t"][idx], d1["res_norm_thigh"][idx], label = "res thigh")
     # plt.plot(d1["t"][idx], d1["res_norm_kmau"][idx], label = "res kmau")
     plt.title("thigh angles mocap")
+    plt.legend()
+    return 
+
+def plot_res_knee(d1):
+    idx = range(10, len(d1["t"]) - 10)
+    
+    plt.figure()
+    plt.plot(d1["t"][idx], d1["no_mc_kma_rel_angle"][idx], label = "kma rel")
+    plt.plot(d1["t"][idx], d1["no_mc_knee_angle"][idx], label = "knee")
+    
+    # plt.plot(d1["t"][idx], d1["mc_kmau_angle"][idx], label = "kma")
+    # plt.plot(d1["t"][idx], d1["mc_thigh_angle"][idx], label = "body part")
+    # plt.plot(d1["t"][idx], d1["res_norm_thigh"][idx], label = "res thigh")
+    # plt.plot(d1["t"][idx], d1["res_norm_kmau"][idx], label = "res kmau")
+    plt.title("knee angles mocap")
     plt.legend()
     return 
 

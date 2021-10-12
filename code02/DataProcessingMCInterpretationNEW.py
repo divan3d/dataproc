@@ -41,7 +41,7 @@ def getinitialdirections(segments):
     thighinit[:,2] = (segments[1][0][0,:]-segments[1][0][3,:])/np.linalg.norm(segments[1][0][0,:]-segments[1][0][3,:])
     # kmal z vect : marker 3 to 1 
     KMAlowinit[:,2] = (segments[2][0][0,:]-segments[2][0][2,:])/np.linalg.norm(segments[2][0][0,:]-segments[2][0][2,:])
-    # kmau z vect : marker 4 to 1 
+    # kmau z vect : marker 2 to 1 
     KMAupinit[:,2] = (segments[3][0][0,:]-segments[3][0][1,:])/np.linalg.norm(segments[3][0][0,:]-segments[3][0][1,:])
     
     #combine the segment initial directions to one list
@@ -120,6 +120,8 @@ def getMoCapAngles(initvecs,refvecs,segments):
     thighang     = np.zeros([len(refvecs[0])])
     KMAlowang    = np.zeros([len(refvecs[0])])
     KMAupang     = np.zeros([len(refvecs[0])])
+    kneeang    = np.zeros([len(refvecs[0])])
+    KMArelang     = np.zeros([len(refvecs[0])])
   
 
     for i in range(0,len(refvecs[0])):
@@ -131,9 +133,16 @@ def getMoCapAngles(initvecs,refvecs,segments):
         thighang[i]  = m.asin(refvecs[1][i][1,2])*180/m.pi + 90
         KMAlowang[i] = m.asin(refvecs[2][i][1,2])*180/m.pi + 90
         KMAupang[i]  = m.asin(refvecs[3][i][1,2])*180/m.pi + 90
-               
+        
+        # knee
+        kneeang[i] = m.acos(np.dot(refvecs[0][i][:,2],refvecs[1][i][:,2])/np.linalg.norm(refvecs[0][i][:,2])/np.linalg.norm(refvecs[1][i][:,2]))*180/m.pi
+        # SE FL1 - fonctionne pas donc balecs
+        # kneeang[i] = np.dot(-refvecs[0][i][:,2],refvecs[1][i][:,2])/np.linalg.norm(refvecs[0][i][:,2])/np.linalg.norm(refvecs[1][i][:,2])
+        # kneeang[i] = m.acos(np.dot(-refvecs[0][i][:,2],-refvecs[1][i][:,2])/np.linalg.norm(refvecs[0][i][:,2])/np.linalg.norm(refvecs[1][i][:,2]))*180/m.pi
+        KMArelang[i] = m.acos(np.dot(-refvecs[3][i][:,1],refvecs[2][i][:,2])/np.linalg.norm(-refvecs[3][i][:,1])/np.linalg.norm(refvecs[2][i][:,2]))/m.pi*180
+        
             
-        MoCapAngles = [shankang,thighang,KMAlowang,KMAupang]
+        MoCapAngles = [shankang,thighang,KMAlowang,KMAupang, kneeang, KMArelang]
         
     return MoCapAngles
 
@@ -204,11 +213,18 @@ def data_processing_interpretation(data_test, have_MS_data):
     temp["mc_thigh_angle"] = MoCapAngles[1]
     temp["mc_kmal_angle"] = MoCapAngles[2]
     temp["mc_kmau_angle"] = MoCapAngles[3]
+    # knee
+    temp["mc_knee_angle"] = MoCapAngles[4]
+    temp["mc_kma_rel_angle"] = MoCapAngles[5]
     temp["vgrf"] = data_test["vgrf"]
     temp["res_norm_shank"] = data_test["ResNormShank"]
     temp["res_norm_thigh"] = data_test["ResNormThigh"]
     temp["res_norm_kmal"] = data_test["ResNormKMAlow"]
     temp["res_norm_kmau"] = data_test["ResNormKMAup"]
+    
+    temp["vgrf1"] = data_test["vgrf1"]
+    temp["vgrf2"] = data_test["vgrf2"]
+    
     
     if have_MS_data == True : 
         temp["current_sent"] = data_test["CurrentSent"]
@@ -225,6 +241,18 @@ def data_processing_interpretation(data_test, have_MS_data):
         temp["GyroCShank"] = data_test["GyroCShank"]
         temp["AccelAThigh"] = data_test["AccelAThigh"]
         temp["AccelAShank"] = data_test["AccelAShank"]
+        
+        # adnri
+        temp["GyroAThigh"] = data_test["GyroAThigh"]
+        temp["GyroAShank"] = data_test["GyroAShank"]
+        temp["AccelBThigh"] = data_test["AccelBThigh"]
+        temp["AccelBShank"] = data_test["AccelBShank"]
+        temp["GyroBThigh"] = data_test["GyroBThigh"]
+        temp["GyroBShank"] = data_test["GyroBShank"]
+        temp["AccelCThigh"] = data_test["AccelCThigh"]
+        temp["AccelCShank"] = data_test["AccelCShank"]
+        
+        temp["HallSensor"] = data_test["HallSensor"]
     
     df = pd.DataFrame(data = temp)
     
