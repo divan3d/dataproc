@@ -36,7 +36,7 @@ for sub in subjects_train:
     # temp_dir = r"E:/ETHZ/mast_sem_IV/pdm/extracted_data/" + sub + "//" + sub + "_EQ_GC_shank"
     temp_dir = r"E:/ETHZ/mast_sem_IV/pdm/extracted_data/" + sub + "//" + sub + "_features"
     # temp_list = os.listdir(temp_dir)
-    temp_list = glob.glob(temp_dir + "/features_fin_thigh*")
+    temp_list = glob.glob(temp_dir + "/features_fin_knee*")
     for file in temp_list :
         # whole_dir = temp_dir + "//" + file
         # dict_gc = op_pickle(whole_dir)
@@ -44,7 +44,7 @@ for sub in subjects_train:
         for key in dict_gc:
             dict_shank[str(counter)] = dict_gc[key]
             counter = counter + 1
-    save_obj(dict_shank, "dict_gait_cycle_thigh_" + sub + ".pkl")
+    save_obj(dict_shank, "dict_gait_cycle_knee_" + sub + ".pkl")
     print(sub)
     print("finished")
     

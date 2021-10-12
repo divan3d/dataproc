@@ -19,6 +19,7 @@ import check_poi_thigh
 import check_poi_shank
 import check_poi_shank_entire_gc
 import check_poi_thigh_entire_gc
+import check_poi_knee_entire_gc
 
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
@@ -51,6 +52,10 @@ f_2 = r"E:\ETHZ\mast_sem_IV\pdm\extracted_data\\" + subject + "\\" + subject + "
 d_2 = op_pickle(f_2)
 
 #%%
+plt.figure()
+plt.plot(d_2["no_mc_knee_angle"])
+
+#%%
 
 # SE_FL3
 # d_1 = d_1.iloc[(11700-8839):]
@@ -61,7 +66,7 @@ d_2 = op_pickle(f_2)
 
 # SF_FL5_1 2 times same leg at beginning 
 # d_1 = d_1.iloc[(12180-8513):]
-
+# 
 # SG_FL3
 # d_2 = d_1.iloc[(60371-50143):]
 
@@ -74,16 +79,31 @@ d_2 = op_pickle(f_2)
 # tc1, ttc1 = check_poi_thigh_entire_gc.keep_good_gc_thigh(d_1)
 # check_poi_thigh.getMaxDict(tc1)
 
-tc2, ttc2 = check_poi_thigh_entire_gc.keep_good_gc_thigh(d_2)
-check_poi_thigh.getMaxDict(tc2)
+# tc2, ttc2 = check_poi_thigh_entire_gc.keep_good_gc_thigh(d_2)
+# check_poi_thigh.getMaxDict(tc2)
 
 #%% shank
 
 # sc1, stc1 = check_poi_shank_entire_gc.keep_good_gc_shank(d_1)
 # check_poi_shank.getMaxDict(sc1)
 
-sc2, stc2 = check_poi_shank_entire_gc.keep_good_gc_shank(d_2)
-check_poi_shank.getMaxDict(sc2)
+# sc2, stc2 = check_poi_shank_entire_gc.keep_good_gc_shank(d_2)
+# check_poi_shank.getMaxDict(sc2)
+
+#%% knee 
+# kc1, ktc1 = check_poi_knee_entire_gc.keep_good_gc_knee(d_1)
+# check_poi_knee_entire_gc.getMaxDict(kc1)
+
+kc2, ktc2 = check_poi_knee_entire_gc.keep_good_gc_knee(d_2)
+check_poi_knee_entire_gc.getMaxDict(kc2)
+
+# os.chdir(dir_name_cut)
+# name_cut = subject + "_" + fl + "_cut_knee_1.pkl"
+# save_obj(kc1, name_cut)
+
+os.chdir(dir_name_cut)
+name_cut = subject + "_" + fl + "_cut_knee_2.pkl"
+save_obj(kc2, name_cut)
 
 #%%
 
@@ -103,11 +123,17 @@ check_poi_shank.getMaxDict(sc2)
 # save_obj(tc1, name_cut)
 
 #SE FL5_2
-del tc2[36]
-del tc2[44]
-del tc2[114]
-del tc2[118]
-del tc2[134]
+# del tc2[36]
+# del tc2[44]
+# del tc2[114]
+# del tc2[118]
+# del tc2[134]
+
+# del kc2[36]
+# del kc2[44]
+# del kc2[114]
+# del kc2[118]
+# del kc2[134]
 
 
 # os.chdir(dir_name_cut)
@@ -121,12 +147,12 @@ del tc2[134]
 # save_obj(sc1, name_cut)
 
 #SE FL5_2
-del sc2[6]
-del sc2[36]
-del sc2[44]
-del sc2[114]
-del sc2[118]
-del sc2[134]
+# del sc2[6]
+# del sc2[36]
+# del sc2[44]
+# del sc2[114]
+# del sc2[118]
+# del sc2[134]
 
 # os.chdir(dir_name_cut)
 # name_cut = subject + "_" + fl + "_cut_shank_2.pkl"
@@ -175,3 +201,28 @@ del sc2[134]
 # os.chdir(dir_name_cut)
 # name_cut = subject + "_" + fl + "_cut_thigh_2.pkl"
 # save_obj(newtc2, name_cut)
+
+
+# newkc2 = {}
+# newnewkc2 = {}
+# counter = 0
+
+# for key in kc2:
+#     if len(kc2[key]) < 135 and kc2[key]["AlphaThigh"][0] > 114.5 and kc2[key]["no_mc_thigh_angle"][0] > 15:
+#         newkc2[counter] = kc2[key]
+#         counter = counter + 1
+      
+# counter = 0
+# for key in newkc2:
+#     if len(newkc2[key]) < 135 and newkc2[key]["AlphaShank"][0] > 70:
+#         newnewkc2[counter] = newkc2[key]
+#         counter = counter + 1
+
+# plt.figure()
+# for key in newnewkc2:
+#     plt.plot(newnewkc2[key]["AlphaThigh"])
+#     plt.plot(newnewkc2[key]["no_mc_thigh_angle"])
+
+# os.chdir(dir_name_cut)
+# name_cut = subject + "_" + fl + "_cut_knee_2.pkl"
+# save_obj(newnewkc2, name_cut)
