@@ -247,3 +247,64 @@ plt.plot(predC, label = "prediction")
 plt.plot(Y_C, label = "true")
 plt.plot(X_C["no_mc_kmau_angle"])
 plt.legend()
+
+#%%
+
+def get_mean_d(test_data, y_data, y_pred):
+    new_df = {}
+    new_df["no_mc_kmau_angle"] = test_data["no_mc_kmau_angle"]
+    new_df["dyn_eq_phase"] = test_data["dyn_eq_phase"]
+    new_df["y_pred"] = y_pred
+    new_df["y_true"] = y_data
+    
+    new_df = pd.DataFrame.from_dict(new_df)
+    
+    ess = indices_to_cut_R(new_df["dyn_eq_phase"])
+    ess2 = ess + 1
+    
+    dict_cut_y_true = {}
+    dict_cut_y_pred = {}
+    dict_cut_no_mc_kmal_angle = {}
+    for cidx in range(len(ess2)-1):
+            dict_cut_y_true[cidx] = new_df["y_true"].iloc[ess2[cidx]: ess2[cidx + 1]].to_numpy()
+            dict_cut_y_pred[cidx] = new_df["y_pred"].iloc[ess2[cidx]: ess2[cidx + 1]].to_numpy()
+            dict_cut_no_mc_kmal_angle[cidx] = new_df["no_mc_kmau_angle"].iloc[ess2[cidx]: ess2[cidx + 1]].to_numpy()
+    
+    # plt.figure()
+    # plt.plot(new_df["dyn_eq_phase"])
+    # plt.plot(ess, new_df["dyn_eq_phase"][ess], "o")
+
+    
+    arr_y_pred = dict_cut_y_pred[0]
+    for key in dict_cut_y_pred:
+        arr_y_pred = np.column_stack((arr_y_pred, dict_cut_y_pred[key]))
+        
+    arr_y_pred = arr_y_pred[:,1:]
+    y_pred_mean = arr_y_pred.mean(axis = 1)
+    
+    arr_y_true = dict_cut_y_true[0]
+    for key in dict_cut_y_true:
+        arr_y_true = np.column_stack((arr_y_true, dict_cut_y_true[key]))
+        
+    arr_y_true = arr_y_true[:,1:]
+    y_true_mean = arr_y_true.mean(axis = 1)
+        
+
+    arr_x = dict_cut_no_mc_kmal_angle[0]
+    for key in dict_cut_no_mc_kmal_angle:
+        arr_x = np.column_stack((arr_x, dict_cut_no_mc_kmal_angle[key]))
+        
+    arr_x = arr_x[:,1:]
+    x_mean = arr_x.mean(axis = 1)
+    
+    plt.figure()
+    plt.plot(y_pred_mean, label = "pred")
+    plt.plot(y_true_mean, label = "true")
+    plt.plot(x_mean, label = "kma")
+    plt.legend()
+    return
+
+#%%
+
+get_mean_d(X_C, Y_C, predC)
+get_mean_d(X_B, Y_B, predB)
