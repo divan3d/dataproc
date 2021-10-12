@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """
-Created on Sun Sep 26 20:54:24 2021
+Created on Thu Sep 30 11:32:59 2021
 
 @author: ksdiv
-check max depth and min child weight with cross validation (leave one subject out)
 """
+
 
 import pandas as pd
 import seaborn as sn
@@ -48,6 +48,8 @@ subG = op_pickle(subGd)
 subHd = r"E:/ETHZ/mast_sem_IV/pdm/code/dict_gait_cycle_knee_SH.pkl"
 subH = op_pickle(subHd)
 
+l_drop_features_d = r"E:/ETHZ/mast_sem_IV/pdm/code/code_ML/list_features_to_dump.pkl"
+l_drop_features = op_pickle(l_drop_features_d)
 #%%
 dico_results = {}
 
@@ -93,15 +95,18 @@ for key_sub in subjects :
 
 
 
-    pd_train = pd_train.drop(columns = ["t", "no_mc_shank_angle", "no_mc_kmal_angle", "no_mc_thigh_angle", "no_mc_kmau_angle", "vgrf", "vgrf1", "vgrf2", "GyroAThigh", "GyroAShank"])
-    pd_valid = pd_valid.drop(columns = ["t", "no_mc_shank_angle", "no_mc_kmal_angle", "no_mc_thigh_angle", "no_mc_kmau_angle", "vgrf", "vgrf1", "vgrf2", "GyroAThigh", "GyroAShank"])
+    pd_train = pd_train.drop(columns = ["t",  "no_mc_thigh_angle", "no_mc_kmau_angle","no_mc_knee_angle", "no_mc_kma_rel_angle", "vgrf", "vgrf1", "vgrf2", "GyroAThigh", "GyroAShank", "AlphaShank", "AlphaThigh"])
+    pd_valid = pd_valid.drop(columns = ["t",  "no_mc_thigh_angle", "no_mc_kmau_angle","no_mc_knee_angle", "no_mc_kma_rel_angle", "vgrf", "vgrf1", "vgrf2", "GyroAThigh", "GyroAShank", "AlphaShank", "AlphaThigh"])
     
-    Y_train = pd_train.pop("no_mc_knee_angle") 
+    Y_train = pd_train.pop("no_mc_shank_angle") 
+    # Y_train = pd_train["no_mc_shank_angle"] - pd_train["no_mc_kmal_angle"]
     # pd_train = pd_train.drop(columns = ["no_mc_knee_angle", "no_mc_kma_rel_angle"])
+    # pd_train = pd_train.drop(columns = ["no_mc_shank_angle", "no_mc_kmal_angle"])
+    pd_train = pd_train.drop(columns = l_drop_features)
     X_train = pd_train
     
-    Y_valid = pd_valid.pop("no_mc_knee_angle") #] - pd_valid["no_mc_kma_rel_angle"]
-    # pd_valid = pd_valid.drop(columns = ["no_mc_knee_angle", "no_mc_kma_rel_angle"])
+    Y_valid = pd_valid.pop("no_mc_shank_angle") 
+    pd_valid = pd_valid.drop(columns = l_drop_features)
     X_valid = pd_valid
     
     # plt.figure()
@@ -113,7 +118,8 @@ for key_sub in subjects :
     # essai 1
     # max_depth = [3,5,7,9]
     max_depth = [3,5,7]
-    min_child_weight = [1,3,5]
+    # max_depth = [4,5,6,7]
+    min_child_weight = [3,5,7,9]
     
     # essai 2
     # max_depth = [5,6,7]
@@ -132,12 +138,14 @@ for key_sub in subjects :
             
             # model = xgb.XGBRegressor(n_estimators = 200, max_depth = max_depth_val, min_child_weight = min_child_weight_val)
             # 2 eme essai 
-            model = xgb.XGBRegressor(n_estimators = 100, max_depth = max_depth_val, min_child_weight = min_child_weight_val)
-            model.fit(X_train, Y_train, eval_set = eval_set, verbose = True)
+            model = xgb.XGBRegressor(n_estimators = 50, max_depth = max_depth_val, min_child_weight = min_child_weight_val)
+            model.fit(X_train, Y_train, eval_set = eval_set, verbose = True, early_stopping_rounds = 5)
+            
+            print(model.best_ntree_limit)
             
             Y_validtest = model.predict(X_valid)            
             validscore = mean_squared_error(Y_valid, Y_validtest)
-            
+          
             Y_traintest = model.predict(X_train)            
             trainscore = mean_squared_error(Y_train, Y_traintest)
             
@@ -148,9 +156,25 @@ for key_sub in subjects :
             dico_results[key_sub][counter]["score train"] = trainscore
             dico_results[key_sub][counter]["important features"] = important_features
             dico_results[key_sub][counter]["progress"] = progress
+            dico_results[key_sub][counter]["best n iter"] = model.best_ntree_limit
             
             print("one iter finished")
             counter = counter + 1
             
-            save_obj(dico_results, "dict_max_depth_min_child_weight_thigh.pkl")
+            save_obj(dico_results, "dict_max_depth_min_child_weight_shank_rm3.pkl")
+
+#%%
+
+# Y_validtest = model.predict(X_valid)            
+            
+# Y_traintest = model.predict(X_train)   
+
+# plt.figure()
+# plt.plot(Y_train)
+# plt.plot(Y_traintest)
+
+# plt.figure()
+# plt.plot(Y_valid)
+# plt.plot(Y_validtest)
+
 
